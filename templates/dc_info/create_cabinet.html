@@ -1,0 +1,79 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% block title %}{% endblock title %}
+{% block script %}
+    <script>
+        $(function () {
+            init_menu();
+        });
+
+        function init_menu() {
+            var dcname = $('#dcname-title').html();
+            var idcname = $('#idcname-title').html();
+            // 初始化菜单部分
+            $('#showye').removeClass('active');
+            $("a[href='#subPages']").removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心信息
+            $('#subPages').addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心对应菜单
+            $("#" + dcname).addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname + idcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开机房菜单
+            $("#" + dcname + idcname).addClass('in').attr("aria-expanded", true);
+            $('#cabinet-info' + dcname + idcname).addClass('active'); // 激活机柜信息
+        }
+    </script>
+{% endblock script %}
+
+
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb mybreadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>增加机柜</li>
+            </ol>
+        </div>
+    </div>
+{% endblock aphorism %}
+
+{% block panel-body %}
+    <form class="form-horizontal" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_number" class="col-sm-2 control-label">机柜编号</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="id_number" name="number" placeholder="机柜编号" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="id_customer" class="col-sm-2 control-label">所属客户</label>
+            <div class="col-sm-10">
+                <select class="form-control" name="customer" id="id_customer">
+                    {% for customer in customer_obj %}
+                        <option value="{{ customer.id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="id_open_date" class="col-sm-2 control-label">开通日期</label>
+            <div class="col-sm-10">
+                <input type="date" class="form-control" name="open_date" id="id_open_date" placeholder="开通日期" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">保存</button>
+                <span class="bg-danger">{{ erro }}</span>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+
+
+{% block log %}
+{% endblock log %}

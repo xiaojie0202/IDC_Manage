@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}数据中心资产管理系统{% endblock title %}</title>
+
+
+{#    <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">#}
+	<link rel="stylesheet" href="{% static 'assets/vendor/linearicons/style.css' %}">
+	<link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+	<link rel="stylesheet" href="{% static 'assets/css/demo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    {% block style %}{% endblock style %}
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery.cookie.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script src="{% static 'assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+	<script src="{% static 'assets/scripts/klorofil-common.js' %}"></script>
+    {% block script %}{% endblock script %}
+</head>
+<body>
+    {% block boby %}
+    {% endblock boby %}
+
+</body>
+</html>

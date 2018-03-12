@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block boby %}
+    <div class="table-responsive">
+    <table class="table table-striped table-condensed ">
+        <thead>
+        <tr>
+            <th>日期</th>
+            <th>客户</th>
+            <th>下架机柜</th>
+            <th>型号</th>
+            <th>SN</th>
+            <th>下架IP</th>
+            <th>操作员工</th>
+            <th>操作类型</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for logobj in page_list %}
+            <tr>
+                <td>{{ logobj.handle_date }}</td>
+                <td>{{ logobj.customer }}</td>
+                <td>{{ logobj.cabinet }}</td>
+                <td>{{ logobj.model_num }}</td>
+                <td>{{ logobj.serial_num }}</td>
+                <td>{{ logobj.ipaddre }}</td>
+                <td>{{ logobj.handle_user.last_name }}{{ logobj.handle_user.first_name }}</td>
+                {% if logobj.handle_type == 0 %}
+                    <td><span class="label label-danger">下架</span></td>
+                {% else %}
+                    <td><span class="label label-success">上架</span></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {#                    服务器日志分页#}
+    <div class="panel-footer" style="background-color: #ffffff">
+        <div class="row">
+            <div class="col-md-12" style="padding-top: 20px">
+                <div class="pull-left">
+                    <form class="navbar-form navbar-left" style="margin: 0; padding: 0" method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="equipment_sn" class="form-control" placeholder="搜索指定设备(sn)日志">
+                            <span class="input-group-btn"><input type="submit"
+                                                                  class="btn btn-primary" value="搜索" ></span>
+                        </div>
+                    </form>
+                </div>
+                <div class="pull-right">
+                    <nav class="pull-right">
+                        <ul class="pagination" style="margin: 0;padding: 0">
+                            {% if page_list.paginator.num_pages > 1 %}
+                                {% if page_list.has_previous %}
+                                    <li>
+                                        <a href="?page={{ page_list.previous_page_number }}"
+                                           aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="disabled">
+                                        <a aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% for i in page_list.paginator.pager_num_range %}
+                                    {% if i == page_list.number %}
+                                        <li class="active"><a href="?page={{ i }}">{{ i }}</a></li>
+                                    {% else %}
+                                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if page_list.has_next %}
+                                    <li>
+                                        <a href="?page={{ page_list.next_page_number }}"
+                                           aria-label="Previous">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="disabled">
+                                        <a aria-label="Previous">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock boby %}

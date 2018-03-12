@@ -1,0 +1,254 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% block title %}客户信息{% endblock title %}
+{% block style %}{% endblock style %}
+{% block script %}
+    <script>
+
+
+        $(function () {
+            init_menu();
+            var customer_name = $('#none-name').html();
+            $.ajax({
+                url: '/customer/'+customer_name+'/',
+                type: 'POST',
+                headers: {'X-CSRFToken': $.cookie('csrftoken')},
+                dataType: 'JSON',
+                success: function (data) {
+                    customerEquipmentCount(data);
+                }
+            });
+
+
+        });
+
+        function init_menu() {
+            var customer_name = $('#none-name').html();
+            $("a[href='#customer-menu']").removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心信息
+            $('#customer-menu').addClass('in').attr("aria-expanded", true);
+            $('#customet-' + customer_name).addClass('active'); // 激活机柜信息
+        }
+
+        function customerEquipmentCount(data) {
+            var customer_equipment = echarts.init(document.getElementById('customer-tj'));
+            var option = {
+                title: {
+                    text: '客户机机柜统计图',
+                    left: 'center',
+                    top: '0',
+                    textStyle: {
+                        color: '#000'
+                    },
+                    subtext: 'by:小杰'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    data: data.name,
+                    bottom: '5%'
+                },
+                series: [
+                    {
+                        name: '机柜数量',
+                        type: 'pie',
+                        radius: ['7%', '30%'],
+                        roseType: 'radius',
+                        label: {
+                            normal: {
+                                formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                                backgroundColor: '#eee',
+                                borderColor: '#aaa',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                rich: {
+                                    a: {
+                                        color: '#999',
+                                        lineHeight: 22,
+                                        align: 'center'
+                                    },
+                                    abg: {
+                                        backgroundColor: '#333',
+                                        width: '100%',
+                                        align: 'right',
+                                        height: 22,
+                                        borderRadius: [4, 4, 0, 0]
+                                    },
+                                    hr: {
+                                        borderColor: '#aaa',
+                                        width: '100%',
+                                        borderWidth: 0.5,
+                                        height: 0
+                                    },
+                                    b: {
+                                        fontSize: 16,
+                                        lineHeight: 33
+                                    },
+                                    per: {
+                                        color: '#eee',
+                                        backgroundColor: '#334455',
+                                        padding: [2, 4],
+                                        borderRadius: 2
+                                    }
+                                }
+                            }
+                        },
+                        data: data.value
+                    }
+                ]
+            };
+            customer_equipment.setOption(option);
+
+        }
+    </script>
+{% endblock script %}
+
+
+{% block aphorism %}
+
+{% endblock aphorism %}
+
+
+
+
+{% block panel-body %}
+    <div id="none-name" style="display: none;">{{ customer.name }}</div>
+    <div class="page-header">
+        <h1>&nbsp;&nbsp;{{ customer.name }}
+            <small>{{ customer.info }}</small>
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="metric">
+                <span class="icon"><i class="glyphicon glyphicon-stats"></i></span>
+                <p>
+                    <span class="number">{{ customer.equipmen_set.all.count }}</span>
+                    <span class="title">设备数量</span>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="metric">
+                <span class="icon"><i class="glyphicon glyphicon-stats"></i></span>
+                <p>
+                    <span class="number">{{ customer.cabinet_set.all.count }}</span>
+                    <span class="title">机柜数量</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <iframe src="{% url 'dcinfo:customer_cabinet_log' %}?customer={{ customer.name }}" frameborder="0"
+                    style="width: 100%; height: 473px" scrolling="no"></iframe>
+        </div>
+        <div class="col-md-6">
+            <div id="customer-tj" style="width: 100%;height: 473px"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+{% block log %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">客户全部机柜号</h3>
+                    <div class="right">
+                        <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+                        <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body no-padding table-responsive">
+                    <table class="table table-striped table-condensed ">
+                        <thead>
+                        <tr>
+                            <th>数据中心</th>
+                            <th>机房</th>
+                            <th>机柜编号</th>
+                            <th>设备数量</th>
+                            <th>所占U数</th>
+                            <th>开通日期</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cabinet in customer.cabinet_set.all %}
+                            <tr>
+                                <td>{{ cabinet.idc.dc.name }}</td>
+                                <td>{{ cabinet.idc.name }}</td>
+                                <td>{{ cabinet.number }}</td>
+                                <td>{{ cabinet.get_equipmen_count }}</td>
+                                <td>{{ cabinet.get_occupy }}</td>
+                                <td>{{ cabinet.open_date }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">所有关闭机柜号</h3>
+                    <div class="right">
+                        <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+                        <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body no-padding table-responsive">
+                    <table class="table table-striped table-condensed ">
+                        <thead>
+                        <tr>
+                            <th>操作日期</th>
+                            <th>数据中心</th>
+                            <th>机房</th>
+                            <th>机柜编号</th>
+                            <th>操作员工</th>
+                            <th>关闭日期</th>
+                            <th>类型</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cabinet in close_cabinet %}
+                            <tr>
+                                <td>{{ cabinet.handle_date }}</td>
+                                <td>{{ cabinet.cabinet_dc }}</td>
+                                <td>{{ cabinet.cabinet_idc }}</td>
+                                <td>{{ cabinet.cabinet_number }}</td>
+                                <td>{{ cabinet.handle_user.last_name }}{{ cabinet.handle_user.first_name }}</td>
+                                <td>{{ cabinet.date }}</td>
+                                <td><span class="label label-danger">关闭</span></td>
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+{% endblock log %}
+
+
+
+{% block motai-title %}
+{% endblock motai-title %}
+
+
+
+{% block motai-body %}
+{% endblock motai-body %}
+
+
+
+{% block motai-btn %}
+{% endblock motai-btn %}

@@ -1,0 +1,275 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% block title %}{{ dcname }}/{{ idcname }}/异常告警{% endblock title %}
+{% block style %}
+    <style>
+        .breadcrumb {
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            list-style: none;
+            background-color: #fff;
+            border-radius: 50px;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script>
+        $(function () {
+            init_menu();
+
+        });
+
+        function init_menu() {
+            // 初始化菜单部分
+            var dcname = $('#dcname-title').html();
+            var idcname = $('#idcname-title').html();
+            $('#showye').removeClass('active'); //删除首页菜单的激活
+            $("a[href='#subPages']").removeClass('collapsed').addClass('active').attr("aria-expanded", true);  //展开数据中心信息
+            $('#subPages').addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true);  //展开对应数据中心菜单
+            $("#" + dcname).addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname + idcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开机房菜单
+            $("#" + dcname + idcname).addClass('in').attr("aria-expanded", true);
+
+            $('#abnormal-info' + dcname + idcname).addClass('active'); //激活本业对应的菜单
+        }
+
+        function changeCabinet(a) {
+            var thisSlecet = a;
+            var data = {id: thisSlecet.val()};
+            $.ajax({
+                url: '/selectinput/get_equipment/',
+                type: 'POST',
+                headers: {'X-CSRFToken': $.cookie('csrftoken')},
+                data: data,
+                dataType: 'JSON',
+                success: function (data) {
+                    thisSlecet.next().html('');
+                    $.each(data.data, function (item, data) {
+                        $('#select_equipment_id').append('<option value="' + data[0] + '">' + data[1] + '-' + data[2] + ':' + data[3] + '</option>')
+                    })
+                }
+            });
+        }
+    </script>
+
+{% endblock script %}
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>异常告警</li>
+            </ol>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">总{{ page_list.paginator.count }}个异常</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            过滤器
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="?schedule=all{% abnormal_condition filter "schedule" %}">清除过滤</a></li>
+                            <li><a href="?schedule=1{% abnormal_condition filter "schedule" %}">已处理</a></li>
+                            <li><a href="?schedule=0{% abnormal_condition filter "schedule" %}">未处理</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="search_abnormal" placeholder="搜索异常(设备SN号)">
+                    </div>
+                    <button type="submit" class="btn btn-default">搜索</button>
+                </form>
+                <div class="nav navbar-nav navbar-right">
+                    <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#myModal"><span
+                            class="glyphicon glyphicon-plus"></span>新增异常
+                    </button>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+{% endblock aphorism %}
+{% block panel-body %}
+    <div class="row">
+        <div class="col-md-12 no-padding table-responsive">
+
+            {% if page_list %}
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                    <tr class="text-center">
+                        <th>机柜编号</th>
+                        <th>位置</th>
+                        <th>厂商</th>
+                        <th>型号</th>
+                        <th>U数</th>
+                        <th>SN</th>
+                        <th>所属客户</th>
+                        <th>异常信息</th>
+                        <th>发现时间</th>
+                        <th>处理进度</th>
+                        <th>处理</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cabinet_info">
+                    {% for abnormal in page_list %}
+                        <tr class="grid-item  text-center">
+                            <td>{{ abnormal.equipment.cabinet }}</td>
+                            <td>{{ abnormal.equipment.place_u }}</td>
+                            <td>{{ abnormal.equipment.manufacturers }}</td>
+                            <td>{{ abnormal.equipment.model_num }}</td>
+                            <td>{{ abnormal.equipment.equipment_u }}</td>
+                            <td>{{ abnormal.equipment.serial_num }}</td>
+                            <td>{{ abnormal.equipment.customer }}</td>
+                            <td>{{ abnormal.info }}</td>
+                            <td>{{ abnormal.find_time }}</td>
+                            {% if abnormal.schedule == 1 %}
+                                <td>
+                                    <button class="btn btn-success btn-xs" role="button">已处理</button>
+                                </td>
+                                <td>{{ abnormal.handel_time }}</td>
+                            {% elif abnormal.schedule == 0 %}
+                                <td>
+                                    <button class="btn btn-danger btn-xs" role="button">未处理</button>
+                                </td>
+                                <td>
+                                    <a class="btn btn-success btn-xs" role="button" href="?handel={{ abnormal.id }}">确认处理</a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-dismissable alert-info">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    此机房没有异常
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block log %}
+
+    <nav class="pull-right">
+        <ul class="pagination">
+            {% if page_list.paginator.num_pages > 1 %}
+                <li><a href="?page=all">显示全部</a></li>
+                {% if page_list.has_previous %}
+                    <li>
+                        <a href="?page={{ page_list.previous_page_number }}{% abnormal_condition filter "page" %}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled">
+                        <a aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for i in page_list.paginator.pager_num_range %}
+                    {% if i == page_list.number %}
+                        <li class="active"><a href="?page={{ i }}{% abnormal_condition filter "page" %}">{{ i }}</a>
+                        </li>
+                    {% else %}
+                        <li><a href="?page={{ i }}{% abnormal_condition filter "page" %}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_list.has_next %}
+                    <li>
+                        <a href="?page={{ page_list.next_page_number }}{% abnormal_condition filter "page" %}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled">
+                        <a aria-label="Previous">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </nav>
+{% endblock log %}
+
+
+
+
+{% block motai-title %}
+    新增异常
+{% endblock motai-title %}
+
+{% block motai-body %}
+    <div class="row">
+        <form class="form-horizontal" id="add_abnormal_info" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="col-md-2 control-label">选择设备</label>
+                <div class="col-md-4">
+                    <select class="form-control" onchange="changeCabinet($(this))">
+                        <option>选择机柜</option>
+                        {% for cabinet in cabinet_obj %}
+                            <option value="{{ cabinet.id }}">{{ cabinet }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <select class="form-control" name="equipment_id" id="select_equipment_id" required></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="info">异常信息</label>
+                <div class="col-md-9">
+                    <textarea class="form-control" rows="3" name="info" id="info" required></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="schedule">处理进度</label>
+                <div class="col-md-3">
+                    <select class="form-control" name="schedule" id="schedule" required>
+                        <option value="0">未处理</option>
+                    </select>
+                </div>
+                <label class="col-md-2 control-label" for="info">发现时间</label>
+                <div class="col-md-4">
+                    <input type="datetime-local" name="find_time" class="form-control">
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+
+
+
+{% endblock motai-body %}
+
+{% block motai-btn %}
+    <button type="submit" class="btn btn-primary" form="add_abnormal_info">保存</button>
+{% endblock motai-btn %}

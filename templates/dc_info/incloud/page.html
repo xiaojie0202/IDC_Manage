@@ -1,0 +1,43 @@
+{% load tags %}
+<nav class="pull-right">
+    <ul class="pagination">
+        {% if page_list.paginator.num_pages > 1 %}
+            <li><a href="?page=all{% minttags filter %}">显示全部</a></li>
+            {% if page_list.has_previous %}
+                <li>
+                    <a href="?page={{ page_list.previous_page_number }}{% minttags filter %}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for i in page_list.paginator.pager_num_range %}
+                {% if i == page_list.number %}
+                    <li class="active"><a href="?page={{ i }}{% minttags filter %}">{{ i }}</a></li>
+                {% else %}
+                    <li><a href="?page={{ i }}{% minttags filter %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_list.has_next %}
+                <li>
+                    <a href="?page={{ page_list.next_page_number }}{% minttags filter %}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a aria-label="Previous">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        {% endif %}
+    </ul>
+</nav>

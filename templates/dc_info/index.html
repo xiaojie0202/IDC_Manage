@@ -1,0 +1,261 @@
+{% extends 'base_site.html' %}
+{% load static %}
+{% block title %}IDC资产管理系统-首页{% endblock title %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'dc_info/css/style.css' %}">
+{% endblock style %}
+{% block script %}
+    <script src="{% static 'dc_info/js/index.js' %}"></script>
+{% endblock script %}
+
+{% block usermenu %}
+    <li><a href="{% url 'dcinfo:userprofile' %}"><i class="lnr lnr-cog"></i> <span>Settings</span></a></li>
+{% endblock usermenu %}
+
+
+
+{% block menu_list %}
+    {#    菜单部分#}
+    <li><a href="{% url 'dcinfo:index' %}" class="active" id="showye"><i class="lnr lnr-home"></i> <span>首页</span></a>
+    </li>
+    <li>
+        <a href="#subPages" data-toggle="collapse" class="collapsed"><i class="glyphicon glyphicon-globe"></i> <span>数据中心信息</span>
+            <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+        <div id="subPages" class="collapse ">
+            <ul class="nav">
+                {% for dcinfo in dc_obj %}
+                    <li>
+                        <a href="#{{ dcinfo.name }}" data-toggle="collapse" class="collapsed"><i
+                                class="glyphicon glyphicon-home"></i> <span>{{ dcinfo.name }}</span> <i
+                                class="icon-submenu lnr lnr-chevron-left"></i></a>
+                        <div id="{{ dcinfo.name }}" class="collapse ">
+                            <ul class="nav">
+
+                                {% for idcinfo in dcinfo.idcinfo_set.all %}
+                                    <li>
+                                        <a href="#{{ dcinfo.name }}{{ idcinfo.name }}" data-toggle="collapse"
+                                           class="collapsed text-center">
+                                            <i class="glyphicon glyphicon-cd"></i> <span>{{ idcinfo.name }}机房</span>
+                                            <i class="icon-submenu lnr lnr-chevron-left"></i>
+                                        </a>
+                                        <div id="{{ dcinfo.name }}{{ idcinfo.name }}" class="collapse ">
+                                            <ul class="nav">
+                                                <li><a href="{% url 'dcinfo:get_cabinet'  dcinfo.name   idcinfo.name %}"
+                                                       class="text-center"
+                                                       id="cabinet-info{{ dcinfo.name }}{{ idcinfo.name }}">机柜管理</a>
+                                                </li>
+                                                <li><a href="{% url 'dcinfo:get_equipmen' dcinfo.name   idcinfo.name %}"
+                                                       class="text-center"
+                                                       id="equipmen-info{{ dcinfo.name }}{{ idcinfo.name }}">设备管理</a>
+                                                </li>
+                                                <li><a href="{% url 'dcinfo:inventory' dcinfo.name   idcinfo.name %}"
+                                                       class="text-center"
+                                                       id="inventory-info{{ dcinfo.name }}{{ idcinfo.name }}">库存管理</a>
+                                                </li>
+                                                <li><a href="{% url 'dcinfo:get_abnormal' dcinfo.name idcinfo.name %}"
+                                                       class="text-center"
+                                                       id="abnormal-info{{ dcinfo.name }}{{ idcinfo.name }}">异常告警</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+
+                {% endfor %}
+            </ul>
+        </div>
+    </li>
+
+    <li>
+        <a href="#customer-menu" data-toggle="collapse" class="collapsed">
+            <i class="glyphicon glyphicon-send"></i>
+            <span>客户资产信息</span>
+            <i class="icon-submenu lnr lnr-chevron-left"></i>
+        </a>
+        <div id="customer-menu" class="collapse ">
+            <ul class="nav">
+                {% for customer in customer_obj %}
+                    <li>
+                        <a href="{% url 'dcinfo:get_customer' customer.name %}" id="customet-{{ customer.name }}">
+                            <i class="glyphicon glyphicon-user"></i>
+                            <span>{{ customer.name }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </li>
+
+    <li><a href="/xadmin" class=""><i class="lnr lnr-linearicons"></i> <span>后台管理</span></a></li>
+{% endblock menu_list %}
+
+
+{% block context %}
+    {% block aphorism %}{% endblock aphorism %}
+    <div class="panel panel-headline">
+
+        <div class="panel-body">
+            {% block panel-body %}
+
+                {#    数据统计部分#}
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <span class="icon"><i class="glyphicon glyphicon-stats"></i></span>
+                            <p>
+                                <span class="number">{{ customer_obj.count }}</span>
+                                <span class="title">客户数量</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <span class="icon"><i class="glyphicon glyphicon-stats"></i></span>
+                            <p>
+                                <span class="number">{{ dc_obj.idc_count }}</span>
+                                <span class="title">机房数量</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <span class="icon"><i class="glyphicon glyphicon-stats"></i></span>
+                            <p>
+                                <span class="number">{{ dc_obj.cabinet_count }}</span>
+                                <span class="title">机柜数量</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric">
+                            <span class="icon"><i class="glyphicon glyphicon-stats"></i></span>
+                            <p>
+                                <span class="number">{{ dc_obj.equipment_count }}</span>
+                                <span class="title">设备数量</span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                {#    统计图部分#}
+                <br>
+                <div class="row">
+                    {#            机柜增减统计图#}
+                    <div class="col-md-7">
+                        <div id="cablein-count" style="width: 100%; height: 400px"></div>
+                    </div>
+                    {#            机房机柜数量圆形统计图#}
+                    <div class="col-md-5">
+                        <div id="idc-count" style="width: 100%; height: 400px"></div>
+                    </div>
+                </div>
+            {% endblock panel-body %}
+        </div>
+    </div>
+
+{% endblock context %}
+
+{#数据统计#}
+{#    日志部分#}
+{% block log %}
+    {#    客户机柜日志#}
+    <div class="row">
+        {#        客户机柜日志#}
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">客户机柜日志</h3>
+                    <div class="right">
+                        <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+                        <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body no-padding" style="height: 473px; overflow: hidden">
+                    <iframe src="{% url 'dcinfo:customer_cabinet_log' %}" frameborder="0"
+                            style="width: 100%; height: 473px" scrolling="no"></iframe>
+                </div>
+            </div>
+
+        </div>
+        {#        客户机柜数量统计图#}
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">客户机柜数量统计图</h3>
+                    <div class="right">
+                        <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+                        <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body no-padding" style="height: 473px">
+                    <div id="customet_caninet_count" style="width: 100%; height: 473px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {#    服务器日志#}
+    <div class="row">
+        {#        客户服务器数量统计图#}
+        <div class="col-md-5">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">客户服务器数量统计图</h3>
+                    <div class="right">
+                        <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+                        <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body no-padding" style="height: 473px">
+                    <div id="customet_equipment_count" style="width: 100%; height: 473px"></div>
+                </div>
+            </div>
+        </div>
+        {#        客户服务器日志#}
+        <div class="col-md-7">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">客户服务器日志</h3>
+                    <div class="right">
+                        <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
+                        <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body no-padding" style="height: 473px; overflow: hidden">
+                    <iframe src="{% url 'dcinfo:customer_equipmen_log' %}" frameborder="0"
+                            style="width: 100%; height: 473px" scrolling="no"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock log %}
+
+
+{% block motai %}
+    <!-- Button trigger modal -->
+
+    <div class="modal fade " id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{% block motai-title %}Modal
+                        title{% endblock motai-title %}</h4>
+                </div>
+                <div class="modal-body">
+                    {% block motai-body %}...{% endblock motai-body %}
+                </div>
+                <div class="modal-footer">
+                    {% block motai-btn %}
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    {% endblock motai-btn %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock motai %}

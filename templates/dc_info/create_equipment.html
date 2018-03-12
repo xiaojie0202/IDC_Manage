@@ -1,0 +1,189 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% load crispy_forms_filters %}
+{% block title %}{% endblock title %}
+{% block style %}
+    <style>
+        .breadcrumb {
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            list-style: none;
+            background-color: #fff;
+            border-radius: 50px;
+        }
+
+        .panel .panel-heading {
+            padding: 10px 15px;
+        }
+
+        .form-group {
+            padding-right: 3%;
+        }
+
+        .form-inline {
+            margin-bottom: 1%;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script src="{% static 'dc_info/js/create_equipment.js' %}"></script>{% endblock script %}
+
+
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb mybreadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>增加设备</li>
+            </ol>
+        </div>
+    </div>
+{% endblock aphorism %}
+
+{% block panel-body %}
+    <div class="row">
+        <form class="form-horizontal" method="post">
+            {% csrf_token %}
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="height: 5%">
+                        <h3 class="panel-title" style="font-size: 16px">基本信息</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% if equipment_form.errors %}
+                            <div class="alert alert-danger" role="alert">{{ equipment_form.errors }}</div>
+                        {% endif %}
+                        {% for field in equipment_form %}
+                            <div class="form-group">
+                                <label for="{{ field.auto_id }}"
+                                       class="col-sm-2 control-label">{{ field.label }}</label>
+                                <div class="col-sm-9">
+                                    {{ field }} <span style="color: red">{{ field.errors }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="height: 5%">
+                        <h3 class="panel-title" style="font-size: 16px">网络信息</h3>
+                        <div class="right" style="float: right; top: 10px; right: 20px">
+                            <button type="button" id="create_ipaddress_form"><i class="glyphicon glyphicon-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="ipaddress_panel">
+                        {{ ipaddr_form.management_form }}
+                        {% for form in ipaddr_form %}
+                            <div class="form-inline">
+                                <div class="form-group">
+
+                                    <span>IPV4地址#{{ forloop.counter }}：</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.tags.auto_id }}">IP标签:</label>
+                                    {{ form.tags }} <span style="color: red">{{ form.tags.errors.0 }}</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.ipaddre.auto_id }}">IP地址:</label>
+                                    {{ form.ipaddre }} <span style="color: red">{{ form.ipaddre.errors.0 }}</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.gateway.auto_id }}">网关地址:</label>
+                                    {{ form.gateway }}<span style="color: red">{{ form.gateway.errors.0 }}</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.netmask.auto_id }}">子网掩码:</label>
+                                    {{ form.netmask }}<span style="color: red">{{ form.netmask.errors.0 }}</span>
+                                </div>
+                                {{ form.id }}
+                                {% if ipaddr_form.can_delete %}
+                                    {{ form.DELETE }}
+                                {% endif %}
+
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="height: 5%">
+                        <h3 class="panel-title" style="font-size: 16px">互联信息</h3>
+                        <div class="right" style="float: right; top: 10px; right: 20px">
+                            <button type="button" id="create_portinfo_forms"><i class="glyphicon glyphicon-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="portinfo_panel">
+                        {{ portinfo_form.management_form }}
+                        {% for form in portinfo_form %}
+                            <div class="form-inline">
+                                <div class="form-group col-md-12">
+                                    <div class="pull-left">
+                                        <span style="padding: 0">互联信息#{{ forloop.counter }}：</span>
+                                    </div>
+                                    {% if portinfo_form.can_delete %}
+                                        <div class="pull-right">
+                                            {{ form.DELETE }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.self_equipment_port.auto_id }}">本端端口号:</label>
+                                    {{ form.self_equipment_port }}{{ form.self_equipment_port.errors.0 }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.up_equipment.auto_id }}">上联设备:</label>
+                                    {{ form.dcname }}{{ form.dcname.errors.0 }}
+                                    {{ form.idcname }}{{ form.idcname.errors.0 }}
+                                    {{ form.cabinet }}{{ form.cabinet.errors.0 }}
+                                    {{ form.up_equipment }}{{ form.up_equipment.errors.0 }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.up_equipment_port.auto_id }}">上联端口号:</label>
+                                    {{ form.up_equipment_port }}{{ form.up_equipment_port.errors.0 }}
+                                </div>
+                                {{ form.id }}
+
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary clearfix" style="width: 100%; margin-top: 10%">保存
+                    </button>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block log %}
+
+{% endblock log %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

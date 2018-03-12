@@ -1,0 +1,146 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% block title %}{{ dcname }}/{{ idcname }}/设备管理{% endblock title %}
+{% block style %}
+    <style>
+        .breadcrumb {
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            list-style: none;
+            background-color: #fff;
+            border-radius: 50px;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script>
+        $(function () {
+            init_menu();
+            load();
+
+        });
+
+        function init_menu() {
+            var dcname = $('#dcname-title').html();
+            var idcname = $('#idcname-title').html();
+            // 初始化菜单部分
+            $('#showye').removeClass('active');
+            $("a[href='#subPages']").removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心信息
+            $('#subPages').addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心对应菜单
+            $("#" + dcname).addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname + idcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开机房菜单
+            $("#" + dcname + idcname).addClass('in').attr("aria-expanded", true);
+            $('#inventory-info' + dcname + idcname).addClass('active'); // 激活机柜信息
+        }
+
+        function load() {
+            $('#import_inventory_excel').click(function () {
+                value = $('#inventory_excel').val();
+                if (value != '') {
+                    $('#progress_load_f').show();
+                    $('#progress_load_z').css({width: '99%'}).html('99%');
+                }
+
+            })
+
+        }
+    </script>
+
+{% endblock script %}
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>批量导入库存</li>
+            </ol>
+        </div>
+    </div>
+{% endblock aphorism %}
+{% block panel-body %}
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <form class="form-inline" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="cabinet_excel">请选择excel文件</label>
+                    <input type="file" id="inventory_excel" class="form-control" name="inventory_excel" required>
+                </div>
+                <button type="submit" class="btn btn-default" id="import_inventory_excel">导入</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="progress" id="progress_load_f" style="display: none">
+                <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar"
+                     aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 5%;" id="progress_load_z">5%
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-md-12 text-center responsive" id="show_import_cabinet_date">
+            {% if info %}
+                {% if info.status %}
+                    <div class="alert alert-danger" role="alert">导入成功</div>
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                        <tr class="text-center">
+                            <th scope="col" class="text-center">位置</th>
+                            <th scope="col" class="text-center">名称</th>
+                            <th scope="col" class="text-center">型号</th>
+                            <th scope="col" class="text-center">资产编号（SN）</th>
+                            <th scope="col" class="text-center">数量</th>
+                            <th scope="col" class="text-center">所属客户</th>
+                            <th scope="col" class="text-center">描述</th>
+                            <th scope="col" class="text-center">物流单号</th>
+                            <th scope="col" class="text-center">状态</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for inventory in info.inventory_list %}
+                            <tr class="grid-item  text-center">
+                                <td>{{ inventory.place }}</td>
+                                <td>{{ inventory.name }}</td>
+                                <td>{{ inventory.name_num }}</td>
+                                <td>{{ inventory.sn }}</td>
+                                <td>{{ inventory.count }}</td>
+                                <td>{{ inventory.customer }}</td>
+                                <td>{{ inventory.node }}</td>
+                                <td>{{ inventory.post_number }}</td>
+
+                                {% if inventory.status == 1 %}
+                                    <td><span class="glyphicon glyphicon-ok"></span></td>
+                                {% else %}
+                                    <td><span class="glyphicon glyphicon-remove"></span></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert alert-danger" role="alert">{{ info.erro }}</div>
+                {% endif %}
+
+            {% else %}
+                <h2>请按照以下格式导入:</h2>
+                <img src="{% static 'img/inventory.png' %}" alt="库存导入格式" class="img-rounded img-responsive">
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block log %}
+{% endblock log %}

@@ -1,0 +1,417 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% block title %}{{ dcname }}/{{ idcname }}/设备管理{% endblock title %}
+{% block style %}
+    <style>
+        .breadcrumb {
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            list-style: none;
+            background-color: #fff;
+            border-radius: 50px;
+        }
+
+        #equipmeninfo_table {
+            font-size: 12px;
+        }
+
+        #equipmeninfo_table thead tr th {
+            text-align: center;
+        }
+
+        #equipmeninfo_table thead tr th:nth-child(1) {
+            padding: 5px;
+            text-align: center;
+        }
+
+        #equipmeninfo_table tbody tr {
+            text-align: center;
+        }
+
+        #equipmeninfo_table tbody tr td {
+            vertical-align: middle;
+            padding: 2px;
+        }
+
+        .portinfo {
+            margin-bottom: 0;
+        }
+
+        .portinfo tbody tr td {
+            text-align: left;
+
+        }
+
+        .portinfo tbody tr:nth-child(1) td {
+            border-top: 0;
+        }
+
+        .dropdown:hover .menu-top {
+            display: block;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu > .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -6px;
+            margin-left: -1px;
+            -webkit-border-radius: 0 6px 6px 6px;
+            -moz-border-radius: 0 6px 6px 6px;
+            border-radius: 0 6px 6px 6px;
+        }
+
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-submenu > a:after {
+            display: block;
+            content: " ";
+            float: right;
+            width: 0;
+            height: 0;
+            border-color: transparent;
+            border-style: solid;
+            border-width: 5px 0 5px 5px;
+            border-left-color: #cccccc;
+            margin-top: 5px;
+            margin-right: -10px;
+        }
+
+        .dropdown-submenu:hover > a:after {
+            border-left-color: #ffffff;
+        }
+
+        .dropdown-submenu .pull-left {
+            float: none;
+        }
+
+        .dropdown-submenu.pull-left > .dropdown-menu {
+            left: -100%;
+            margin-left: 10px;
+            -webkit-border-radius: 6px 0 6px 6px;
+            -moz-border-radius: 6px 0 6px 6px;
+            border-radius: 6px 0 6px 6px;
+        }
+
+        #show_remove_equipment tr td {
+            vertical-align: middle;
+        }
+
+        #show_remove_equipment .info {
+            background-color: #F2DEDE;
+        !important
+        }
+
+        .danger table tbody tr {
+            background-color: #F2DEDE;
+        }
+
+        .danger table tbody tr td {
+            background-color: #F2DEDE;
+        }
+
+        .show_portinfo:hover {
+            cursor: pointer;
+        }
+        .modal-lg {
+            width: 80%;
+        }
+
+    </style>
+{% endblock style %}
+{% block script %}<script src="{% static 'dc_info/js/equipmentinfo.js' %}"></script>{% endblock script %}
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>设备管理</li>
+            </ol>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">总{{ page_list.paginator.count }}台设备</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">过滤器 <b class="caret"></b></a>
+                        <ul class="dropdown-menu menu-top">
+                            <li class="dropdown-submenu"><a>所属机柜</a>
+                                <ul class="dropdown-menu">
+                                    {% for cabinet_obj in cabinet_queryset %}
+                                        <li style="text-align: center">
+                                            <a href="?cabinet_id=
+                                                    {{ cabinet_obj.id }}{% equipment_condition filter 'cabinet_id' %}">
+                                                {{ cabinet_obj }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <li class="dropdown-submenu"><a>所属客户</a>
+                                <ul class="dropdown-menu">
+                                    {% for customet in customer_obj %}
+                                        <li>
+                                            <a href="?customer_id=
+                                                    {{ customet.id }}{% equipment_condition filter 'customer_id' %}">
+                                                {{ customet.name }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="search_cabinet" placeholder="搜索设备(设备SN，IP地址)">
+                    </div>
+                    <button type="submit" class="btn btn-default">搜索</button>
+                </form>
+                <div class="nav navbar-nav navbar-right">
+                    <a type="button" class="btn btn-default navbar-btn"
+                       href="{% url 'dcinfo:create_equipment' dcname idcname %}"><span
+                            class="glyphicon glyphicon-plus"></span>增加设备
+                    </a>
+                    <a type="button" class="btn btn-default navbar-btn"
+                       href="{% url 'dcinfo:import_equipment' dcname idcname %}"><span
+                            class="glyphicon glyphicon-share-alt"></span>导入设备
+                    </a>
+                    <a type="button" class="btn btn-default navbar-btn"><span
+                            class="glyphicon glyphicon-share-alt"></span>导出设备
+                    </a>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    {#    删除机柜专用提示框#}
+    <div class="alert alert-dismissable alert-success" id="remove_equipment_seccuse" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <span>条目必须选中以对其进行操作。没有任何条目被更改。</span>
+    </div>
+    {#    机柜删除完毕提示框#}
+    <div class="alert alert-success" role="alert" style="display: none" id="remove_equipment_list_str">删除.....设备成</div>
+    {% if addequipment %}
+    <div class="alert alert-success" role="alert" >操作成功：{{ addequipment }}</div>
+    {% endif %}
+{% endblock aphorism %}
+{% block panel-body %}
+    <div class="row">
+        <div class="col-md-12 no-padding table-responsive">
+            {% if page_list %}
+                <table class="table table-bordered table-striped table-hover table-condensed no-padding"
+                       id="equipmeninfo_table">
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" id="thead_checkbox"></th>
+                        <th>机柜编号</th>
+                        <th>位置</th>
+                        <th>厂商</th>
+                        <th>型号</th>
+                        <th>U数</th>
+                        <th>SN</th>
+                        <th>所属客户</th>
+                        <th>用途 / IP地址 / 子网掩码 / 网关</th>
+                        <th>网络设备机柜 / 网络设备位置 / 网络设备型号 / 网络设备SN号 / 网络设备端口 / 服务器端口</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="equipmentinfo">
+                    {% for equipmen in page_list %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" value="{{ equipmen.id }}"
+                                       id="select_equipment_{{ equipmen.id }}">
+                            </td>
+                            <td id="equipment_cabinet_{{ equipmen.id }}">{{ equipmen.cabinet }}</td>
+                            <td id="equipment_place_{{ equipmen.id }}">{{ equipmen.place_u }}U</td>
+                            <td id="equipment_manufacturers_{{ equipmen.id }}">{{ equipmen.manufacturers }}</td>
+                            <td id="equipment_model_{{ equipmen.id }}">{{ equipmen.model_num }}</td>
+                            <td id="equipment_u_{{ equipmen.id }}">{{ equipmen.equipment_u }}U</td>
+                            <td id="equipment_sn_{{ equipmen.id }}">{{ equipmen.serial_num }}</td>
+                            <td id="equipment_customet_{{ equipmen.id }}">{{ equipmen.customer }}</td>
+                            <td>
+                                <table class="table portinfo table-condensed" id="equipment_ip_{{ equipmen.id }}">
+                                    <tbody>
+                                    {% for ipinfo in equipmen.ipaddress_set.all %}
+                                        <tr>
+                                            <td>{% if ipinfo.tags %}{{ ipinfo.tags }}{% else %}地址{% endif %}</td>
+                                            <td>{{ ipinfo.ipaddre }}</td>
+                                            <td>{{ ipinfo.netmask }}</td>
+                                            <td>{{ ipinfo.gateway }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                            {% if equipmen.equipment_type == 2 %}
+                                <td><a class="show_portinfo">查看互联信息</a></td>
+                            {% elif equipmen.equipment_type == 1 %}
+                                <td>
+                                    <table class="table portinfo table-condensed"
+                                           id="equipment_portinfo_{{ equipmen.id }}">
+                                        <tbody>
+                                        {% for portinfo in equipmen.self_equipment.all %}
+                                            <tr>
+                                                <td>{{ portinfo.up_equipment.cabinet }}</td>
+                                                <td>{{ portinfo.up_equipment.place_u }}U</td>
+                                                <td>{{ portinfo.up_equipment.manufacturers }} {{ portinfo.up_equipment.model_num }}</td>
+                                                <td>{{ portinfo.up_equipment.serial_num }}</td>
+                                                <td>{{ portinfo.up_equipment_port }}</td>
+                                                <td>{{ portinfo.self_equipment_port }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            {% endif %}
+                            <td>
+                                <a href="{% url 'dcinfo:edit_equipment' dcname idcname equipmen.id %}" class="btn btn-info btn-xs" role="button">编辑</a>
+                                <button class="btn btn-danger btn-xs" role="button">删除</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-dismissable alert-info">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    没有查询到设备
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block log %}
+    <div class="row">
+        <div class="col-md-7" style="line-height: 79px">
+            <button type="button" class="btn btn-primary" id="bulk_remove_equipment">批量删除
+            </button>
+        </div>
+        <div class="col-md-5">
+            {#    分页#}
+            <nav class="pull-right">
+                <ul class="pagination">
+                    {% if page_list.paginator.num_pages > 1 %}
+                        <li><a href="?page=all{% equipment_condition filter 'page' %}">显示全部</a></li>
+                        {% if page_list.has_previous %}
+                            <li>
+                                <a href="?page=
+                                        {{ page_list.previous_page_number }}{% equipment_condition filter 'page' %}"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="disabled">
+                                <a aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% for i in page_list.paginator.pager_num_range %}
+                            {% if i == page_list.number %}
+                                <li class="active"><a
+                                        href="?page={{ i }}{% equipment_condition filter 'page' %}">{{ i }}</a></li>
+                            {% else %}
+                                <li><a href="?page={{ i }}{% equipment_condition filter 'page' %}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_list.has_next %}
+                            <li>
+                                <a href="?page={{ page_list.next_page_number }}{% equipment_condition filter 'page' %}"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="disabled">
+                                <a aria-label="Previous">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock log %}
+
+{% block motai-title %}
+    信息：
+{% endblock motai-title %}
+
+{% block motai-body %}
+    <div class="row" id="remove_equipment_div">
+        <div class="col-md-12 table-responsive" id="motai_conter">
+            <table class="table table-bordered portinfo table-condensed">
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>机柜</th>
+                    <th>位置</th>
+                    <th>厂商</th>
+                    <th>型号</th>
+                    <th>U数</th>
+                    <th>SN</th>
+                    <th>客户</th>
+                    <th class="text-center">IP地址</th>
+                </tr>
+                </thead>
+                <tbody id="show_remove_equipment">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="row" id="network_port_info_div">
+        <div class="col-md-12 table-responsive">
+            <table class="table table-bordered portinfo table-condensed table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>本端机柜</th>
+                    <th>本端型号</th>
+                    <th>本端序列号</th>
+                    <th>本端端口号</th>
+                    <th>TO</th>
+                    <th>对端机柜</th>
+                    <th>对端型号</th>
+                    <th>对端序列号</th>
+                    <th>对端端口号</th>
+                </tr>
+                </thead>
+                <tbody id="show_network_port_info_tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock motai-body %}
+
+{% block motai-btn %}
+    <button type="button" class="btn btn-danger" id="remove_equipment_btn">确认删除</button>
+{% endblock motai-btn %}

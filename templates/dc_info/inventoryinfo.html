@@ -1,0 +1,389 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% block title %}{{ dcname }}/{{ idcname }}/库存信息{% endblock title %}
+{% block style %}
+    <style>
+        .breadcrumb {
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            list-style: none;
+            background-color: #fff;
+            border-radius: 50px;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script>
+        $(function () {
+            init_menu();
+            selectAllInventroy();
+            selectInventory();
+            showRemoveCabinetInfo();
+            bulkRemoveCabinetAjax();
+            bulkDeleteInventory();
+            updateInventoruCount();
+        });
+
+        // 初始化菜单部分
+        function init_menu() {
+            var dcname = $('#dcname-title').html();
+            var idcname = $('#idcname-title').html();
+            $('#showye').removeClass('active'); //删除首页菜单的激活
+            $("a[href='#subPages']").removeClass('collapsed').addClass('active').attr("aria-expanded", true);  //展开数据中心信息
+            $('#subPages').addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true);  //展开对应数据中心菜单
+            $("#" + dcname).addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname + idcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开机房菜单
+            $("#" + dcname + idcname).addClass('in').attr("aria-expanded", true);
+
+            $('#inventory-info' + dcname + idcname).addClass('active'); //激活本业对应的菜单
+        }
+
+        //选中全部的单选框按钮
+        function selectAllInventroy() {
+            $('#thead_checkbox').click(function () {
+                var selectIput = $('#inventory_info').find('input');
+                if ($(this).is(':checked')) {
+                    selectIput.prop('checked', true);
+                    selectIput.parent().parent().addClass('info')
+                } else {
+                    selectIput.prop('checked', false);
+                    selectIput.parent().parent().removeClass('info')
+                }
+            });
+        }
+
+        //单选按钮事件处理
+        function selectInventory() {
+            var selectIput = $('#inventory_info').find('input');
+            selectIput.click(function () {
+                if ($(this).is(':checked')) {
+                    $(this).prop('checked', true).parent().parent().addClass('info');
+                } else {
+                    $(this).prop('checked', false).parent().parent().removeClass('info');
+                }
+            })
+        }
+
+        //删除库存按钮事件处理
+        function showRemoveCabinetInfo() {
+            var removeBtn = $('#inventory_info').find('button');
+            removeBtn.on('click', function () {
+                var inventory_id = $(this).parent().parent().find('input').val();
+                var place = $('#place' + inventory_id).html();
+                var name = $('#name' + inventory_id).html();
+                var name_num = $('#name_num' + inventory_id).html();
+                var sn = $('#sn' + inventory_id).html();
+                var count = $('#count' + inventory_id).html();
+                var customer = $('#customer' + inventory_id).html();
+                var node = $('#node' + inventory_id).html();
+                $('#show_remove_inventory').html(
+                    "<tr class=\"danger\"><td class=\"get_inventory_id_td\">" + inventory_id +
+                    "</td><td>" + place +
+                    "</td><td>" + name +
+                    "</td><td>" + name_num +
+                    "</td><td>" + sn +
+                    "</td><td>" + count +
+                    "</td><td>" + customer +
+                    "</td><td>" + node +
+                    "</td></tr>"
+                );
+                $('#myModal').modal('show');
+            })
+        }
+
+        //批量删除机柜按钮事件处理
+        function bulkRemoveCabinetAjax() {
+            var showmotai = false;
+            $('#bulk_remove_inventory').click(function () {
+                var selectIput = $('#inventory_info').find('input');
+                var show_remove_cabinet = $('#show_remove_inventory');
+                show_remove_cabinet.html("");
+                for (var i = 0; i < selectIput.length; i++) {
+                    if (selectIput.eq(i).is(':checked')) {
+                        showmotai = true;
+                        var inventory_id = selectIput.eq(i).attr('value');
+                        var place = $('#place' + inventory_id).html();
+                        var name = $('#name' + inventory_id).html();
+                        var name_num = $('#name_num' + inventory_id).html();
+                        var sn = $('#sn' + inventory_id).html();
+                        var count = $('#count' + inventory_id).html();
+                        var customer = $('#customer' + inventory_id).html();
+                        var node = $('#node' + inventory_id).html();
+                        show_remove_cabinet.append(
+                            "<tr class=\"danger\"><td class=\"get_inventory_id_td\">" + inventory_id +
+                            "</td><td>" + place +
+                            "</td><td>" + name +
+                            "</td><td>" + name_num +
+                            "</td><td>" + sn +
+                            "</td><td>" + count +
+                            "</td><td>" + customer +
+                            "</td><td>" + node +
+                            "</td></tr>"
+                        );
+
+                    }
+                }
+                if (showmotai) {
+                    $('#remove_equipment_div').show();
+                    $('#network_port_info_div').hide();
+                    $('#remove_equipment_btn').show();
+                    $('#myModal').modal('show');
+                } else {
+                    $('#remove_equipment_seccuse').show();
+                }
+            })
+        }
+
+        //确认删除库存按钮事件传力
+        function bulkDeleteInventory() {
+            $('#remove_inventroy_btn').click(function () {
+                var idlist = {};
+                var remove_inventory_id = $('#show_remove_inventory').find('.get_inventory_id_td');
+                $.each(remove_inventory_id, function (item, data) {
+                    idlist[item] = remove_inventory_id.eq(item).html();
+                });
+                $.ajax({
+                    url: '/delete_inventory/',
+                    type: 'POST',
+                    headers: {'X-CSRFToken': $.cookie('csrftoken')},
+                    data: idlist,
+                    dataType: 'JSON',
+                    success: function (data) {
+                        if (data.status) {
+                            $('#myModal').modal('hide');
+                            $('#show_remove_inventory').html("");
+                            $.each(data.delete_id, function (item, date) {
+                                $('#select_inventory_' + date).parent().parent().remove()
+                            });
+                            $('#remove_inventory_seccuse').show()
+                        } else {
+                            alert('删除失败')
+                        }
+                    }
+                })
+            });
+
+        }
+
+        //增减库存数量
+        function updateInventoruCount() {
+            $('.minus-inventory-count').click(function () {
+                var inventory_id = $(this).parent().parent().find('input').val();
+                var count_span = $('#count' + inventory_id);
+                var num = parseInt(count_span.html()) - 1;
+                ajaxUpdateInventoryCount("/update_inventory_count/minus/", inventory_id, count_span, num);
+
+            });
+
+
+            $('.add-inventory-count').click(function () {
+                var inventory_id = $(this).parent().parent().find('input').val();
+                var count_span = $('#count' + inventory_id);
+                var num = parseInt(count_span.html()) + 1;
+                ajaxUpdateInventoryCount("/update_inventory_count/add/", inventory_id, count_span, num);
+
+            });
+        }
+
+        function ajaxUpdateInventoryCount(url, id, span, num) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'JSON',
+                headers: {'X-CSRFToken': $.cookie('csrftoken')},
+                data: {"inventory_id": id},
+                success: function (data) {
+                    span.html(num);
+                }
+            });
+        }
+
+    </script>
+
+{% endblock script %}
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>库存管理</li>
+            </ol>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">总{{ page_list.paginator.count }}个库存</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">过滤器 <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            {% for customet in customer_obj %}
+                                <li>
+                                    <a href="?filter={{ customet.id }}">
+                                        {{ customet.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="search" placeholder="搜索库存(SN，物流单号)">
+                    </div>
+                    <button type="submit" class="btn btn-default">搜索</button>
+                </form>
+                <div class="nav navbar-nav navbar-right">
+                    <a type="button" class="btn btn-default navbar-btn"
+                       href="{% url 'dcinfo:add_inventory' dcname idcname %}">
+                        <span class="glyphicon glyphicon-plus"></span>增加库存
+                    </a>
+                    <a type="button" class="btn btn-default navbar-btn"
+                       href="{% url 'dcinfo:import_inventory' dcname idcname %}"><span
+                            class="glyphicon glyphicon-share-alt"></span>导入库存
+                    </a>
+                    <a type="button" class="btn btn-default navbar-btn"><span
+                            class="glyphicon glyphicon-share-alt"></span>导出库存
+                    </a>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="alert alert-dismissable alert-success" id="remove_inventory_seccuse" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <span>删除成功</span>
+    </div>
+    {% if add %}
+        <div class="alert alert-dismissable alert-success">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <span>操作成功:{{ add }}</span>
+        </div>
+    {% endif %}
+{% endblock aphorism %}
+{% block panel-body %}
+    <div class="row">
+        <div class="col-md-12 no-padding table-responsive">
+            {% if page_list %}
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                    <tr class="text-center">
+                        <th scope="col" class=" text-center"><input type="checkbox" id="thead_checkbox" name="xiaojie">
+                        </th>
+                        <th scope="col" class="text-center">位置</th>
+                        <th scope="col" class="text-center">名称</th>
+                        <th scope="col" class="text-center">型号</th>
+                        <th scope="col" class="text-center">资产编号（SN）</th>
+                        <th scope="col" class="text-center">数量</th>
+                        <th scope="col" class="text-center">所属客户</th>
+                        <th scope="col" class="text-center">描述</th>
+                        <th scope="col" class="text-center">物流单号</th>
+
+                        <th scope="col" class="text-center">状态</th>
+                        <th scope="col" class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="inventory_info">
+                    {% for inventory in page_list %}
+                        <tr class="grid-item  text-center">
+                            <td class="action-checkbox"><input type="checkbox" value="{{ inventory.id }}"
+                                                               id="select_inventory_{{ inventory.id }}"
+                                                               name="inventory_id">
+                            </td>
+                            <td id="place{{ inventory.id }}">{{ inventory.place }}</td>
+                            <td id="name{{ inventory.id }}">{{ inventory.name }}</td>
+                            <td id="name_num{{ inventory.id }}">{{ inventory.name_num }}</td>
+                            <td id="sn{{ inventory.id }}">{{ inventory.sn }}</td>
+                            <td>
+                                <span class="glyphicon glyphicon-minus-sign pull-left minus-inventory-count"></span>
+                                <span id="count{{ inventory.id }}">{{ inventory.count }}</span>
+                                <span class="glyphicon glyphicon-plus-sign pull-right add-inventory-count"></span>
+                            </td>
+                            <td id="customer{{ inventory.id }}">{{ inventory.customer }}</td>
+                            <td id="node{{ inventory.id }}">{{ inventory.node }}</td>
+                            <td>{{ inventory.post_number }}</td>
+
+                            {% if inventory.status == 1 %}
+                                <td><span class="glyphicon glyphicon-ok"></span></td>
+                            {% else %}
+                                <td><span class="glyphicon glyphicon-remove"></span></td>
+                            {% endif %}
+                            <td class="nowrap">
+                                <a class="btn btn-info btn-xs" role="button" href="{% url 'dcinfo:edit_inventory' dcname idcname inventory.id %}">编辑</a>
+                                <button class="btn btn-danger btn-xs" role="button">删除</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-dismissable alert-info">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    没有此库存！
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block log %}
+    <div class="row">
+        <div class="col-md-7" style="line-height: 79px">
+            <button type="button" class="btn btn-primary" id="bulk_remove_inventory">批量删除
+            </button>
+        </div>
+        <div class="col-md-5">
+            {#    分页#}
+            {% include 'dc_info/incloud/page.html' %}
+        </div>
+    </div>
+{% endblock log %}
+
+
+{% block motai-title %}
+    确认删除以下库存？
+{% endblock motai-title %}
+
+{% block motai-body %}
+    <div class="row">
+        <div class="col-md-12 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>位置</th>
+                    <th>名称</th>
+                    <th>型号</th>
+                    <th>资产编号（SN）</th>
+                    <th>数量</th>
+                    <th>所属客户</th>
+                    <th>描述</th>
+                </tr>
+                </thead>
+                <tbody id="show_remove_inventory">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock motai-body %}
+
+{% block motai-btn %}
+    <button type="button" class="btn btn-danger" id="remove_inventroy_btn">确认删除</button>
+{% endblock motai-btn %}

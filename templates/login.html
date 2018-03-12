@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    登录资产管理系统
+{% endblock title %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'login/css/font-awesome.css' %}">
+<link rel="stylesheet" href="{% static 'login/css/style.css' %}" type="text/css" media="all" />
+{% endblock style %}
+
+{% block boby %}
+		<!--header-->
+		<div class="header-w3l">
+			<h1>IDC机房资产管理系统</h1>
+		</div>
+		<!--//header-->
+		<!--main-->
+		<div class="main-w3layouts-agileinfo">
+	           <!--form-stars-here-->
+						<div class="wthree-form">
+							<h2>Fill out the form below to login</h2>
+							<form  method="post">
+                                {% csrf_token %}
+								<div class="form-sub-w3">
+									<input type="text" name="username" placeholder="Username " required="" />
+								<div class="icon-w3">
+									<i class="fa fa-user" aria-hidden="true"></i>
+								</div>
+								</div>
+								<div class="form-sub-w3">
+									<input type="password" name="password" placeholder="Password" required="" />
+								<div class="icon-w3">
+									<i class="fa fa-unlock-alt" aria-hidden="true"></i>
+								</div>
+								</div>
+								<div class="clear"><span style="color: red">{{ erro }}</span></div>
+
+								<div class="submit-agileits">
+									<input type="submit" value="Login">
+								</div>
+							</form>
+
+						</div>
+				<!--//form-ends-here-->
+
+		</div>
+		<!--//main-->
+		<!--footer-->
+		<div class="footer">
+			<p>Copyright &copy; 2017 by小杰 All rights reserved</p>
+		</div>
+		<!--//footer-->
+{% endblock boby %}

@@ -1,0 +1,69 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% block title %}{% endblock title %}
+{% block script %}
+    <script>
+        $(function () {
+            init_menu();
+        });
+
+        function init_menu() {
+            var dcname = $('#dcname-title').html();
+            var idcname = $('#idcname-title').html();
+            // 初始化菜单部分
+            $('#showye').removeClass('active');
+            $("a[href='#subPages']").removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心信息
+            $('#subPages').addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开数据中心对应菜单
+            $("#" + dcname).addClass('in').attr("aria-expanded", true);
+
+            $("a[href='#" + dcname + idcname).removeClass('collapsed').addClass('active').attr("aria-expanded", true); //展开机房菜单
+            $("#" + dcname + idcname).addClass('in').attr("aria-expanded", true);
+            $('#inventory-info' + dcname + idcname).addClass('active'); //激活本业对应的菜单
+        }
+    </script>
+{% endblock script %}
+
+
+{% block aphorism %}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb mybreadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>库存</li>
+            </ol>
+        </div>
+    </div>
+{% endblock aphorism %}
+
+{% block panel-body %}
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+        {% for form in inventory_form %}
+            <div class="form-group">
+                <label class="col-sm-1 control-label" for="{{ form.auto_id }}">{{ form.label }}</label>
+                <div class="col-sm-3">
+                    {{ form }} <span style="color: red;">{{ form.errors.0 }}</span>
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="form-group">
+            <br>
+            <br>
+            <div class="col-md-1 col-md-offset-1">
+                <button type="submit" class="btn btn-primary" style="width: 100%">提交</button>
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}
+
+
+
+{% block log %}
+{% endblock log %}

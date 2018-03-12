@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name">
+    <input type="text" name="name">
+    <input type="text" name="name">
+    <input type="text" name="name">
+    <input type="date" name="name">
+    {{ form.as_p }}
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+
+
+<div class="panel-body">
+    <input type="hidden" name="port-TOTAL_FORMS" value="1" id="id_port-TOTAL_FORMS"><input type="hidden"
+                                                                                           name="port-INITIAL_FORMS"
+                                                                                           value="0"
+                                                                                           id="id_port-INITIAL_FORMS"><input
+        type="hidden" name="port-MIN_NUM_FORMS" value="0" id="id_port-MIN_NUM_FORMS"><input type="hidden"
+                                                                                            name="port-MAX_NUM_FORMS"
+                                                                                            value="1000"
+                                                                                            id="id_port-MAX_NUM_FORMS">
+
+    <div class="form-inline">
+        <div class="form-group"><span>互联信息#1：</span></div>
+        <div class="form-group"><label for="id_port-0-self_equipment_port">本端端口号:</label>
+            <input type="text" name="port-0-self_equipment_port" class="form-control" maxlength="32" id="id_port-0-self_equipment_port"></div>
+        <div class="form-group"><label for="id_port-0-up_equipment">上联设备:</label>
+            <select name="port-0-dcname" class="form-control" id="id_port-0-dcname" ><option value="" selected="">数据中心</option></select>
+            <select name="port-0-idcname" class="form-control" id="id_port-0-idcname"></select>
+            <select name="port-0-cabinet" class="form-control" id="id_port-0-cabinet"></select>
+            <select name="port-0-up_equipment" class="form-control" id="id_port-0-up_equipment"><option value="" selected="">---------</option></select>
+        </div>
+        <div class="form-group"><label for="id_port-0-up_equipment_port">上联端口号:</label>
+            <input type="text" name="port-0-up_equipment_port" class="form-control" maxlength="32" id="id_port-0-up_equipment_port"></div>
+        <input type="hidden" name="port-0-id" id="id_port-0-id">
+    </div>
+
+
+</div>

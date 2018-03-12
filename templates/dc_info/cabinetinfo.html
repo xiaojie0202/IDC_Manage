@@ -1,0 +1,183 @@
+{% extends 'dc_info/index.html' %}
+{% load static %}
+{% load tags %}
+{% block title %}{{ dcname }}/{{ idcname }}/机柜管理{% endblock title %}
+{% block style %}
+    <style>
+        .mybreadcrumb {
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            list-style: none;
+            background-color: #fff;
+            border-radius: 50px;
+        }
+    </style>
+{% endblock style %}
+{% block script %}<script src="{% static 'dc_info/js/cabinetinfo.js' %}"></script>{% endblock script %}
+
+
+{% block aphorism %}
+    {#    分页导航#}
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb mybreadcrumb">
+                <li id="dcname-title">{{ dcname }}</li>
+                <li id="idcname-title">{{ idcname }}</li>
+                <li>机柜管理</li>
+            </ol>
+        </div>
+    </div>
+    {#过滤器，搜索 导入导出 导航条#}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">总{{ page_list.paginator.count }}个机柜</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">过滤器
+                            <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="?filter=all">全部</a></li>
+                            {% for i in customer_obj %}
+                                <li><a href="?filter={{ i.id }}">{{ i.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="search_cabinet" placeholder="搜索机柜(机柜编号)">
+                    </div>
+                    <button type="submit" class="btn btn-default">搜索</button>
+                </form>
+                <div class="nav navbar-nav navbar-right">
+                    <a type="button" class="btn btn-default navbar-btn"
+                       href="{% url 'dcinfo:create_cabinet' dcname idcname %}"><span
+                            class="glyphicon glyphicon-plus"></span>增加机柜
+                    </a>
+                    <a type="button" class="btn btn-default navbar-btn" href="{% url 'dcinfo:import_cabinet' dcname idcname %}"><span
+                            class="glyphicon glyphicon-share-alt"></span>导入机柜
+                    </a>
+                    <a type="button" class="btn btn-default navbar-btn"><span
+                            class="glyphicon glyphicon-share-alt"></span>导出机柜
+                    </a>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    {#    误操作信息#}
+    {% if addcabinet %}
+        <div class="alert alert-dismissable alert-success">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            添加机柜成功:{{ dcname }}-{{ addcabinet }}
+        </div>
+    {% endif %}
+    {#    删除机柜专用提示框#}
+    <div class="alert alert-dismissable alert-success" id="remove_cabinet_seccuse" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <span>条目必须选中以对其进行操作。没有任何条目被更改。</span>
+    </div>
+{#    机柜删除完毕提示框#}
+    <div class="alert alert-success" role="alert" style="display: none" id="remove_cabinet_list_str">删除.....机柜成</div>
+{% endblock aphorism %}
+
+{% block panel-body %}
+    <div class="row">
+        <div class="col-md-12 no-padding table-responsive">
+            {% if page_list %}
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                    <tr class="text-center">
+                        <th scope="col" class=" text-center"><input type="checkbox" id="thead_checkbox" name="xiaojie">
+                        </th>
+                        <th scope="col" class="text-center">数据中心</th>
+                        <th scope="col" class="text-center">所属机房</th>
+                        <th scope="col" class="text-center">机柜编号</th>
+                        <th scope="col" class="text-center">所属客户</th>
+                        <th scope="col" class="text-center">设备数量</th>
+                        <th scope="col" class="text-center">已占用U数</th>
+                        <th scope="col" class="text-center">机柜开通日期</th>
+                        <th scope="col" class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cabinet_info">
+                    {% for cabinet in page_list %}
+                        <tr class="grid-item  text-center">
+                            <td class="action-checkbox"><input type="checkbox" value="{{ cabinet.id }}"
+                                                               id="select_cabinet_{{ cabinet.id }}" name="cabinet_id">
+                            </td>
+                            <td>{{ cabinet.idc.dc.name }}</td>
+                            <td class="nowrap">{{ cabinet.idc.name }}</td>
+                            <td id="cabinet_number_{{ cabinet.id }}">{{ cabinet.number }}</td>
+                            <td class="nowrap" id="cabinet_customer_{{ cabinet.id }}">{{ cabinet.customer.name }}</td>
+                            <td>{{ cabinet.get_equipmen_count }}</td>
+                            <td>{{ cabinet.get_occupy }}</td>
+                            <td class="nowrap">{{ cabinet.open_date }}</td>
+                            <td class="nowrap">
+                                {#                                <a href="#" class="btn btn-info btn-xs" role="button">编辑</a>#}
+                                <button class="btn btn-danger btn-xs" role="button" data-toggle="modal" data-target="#myModal">删除</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-dismissable alert-info">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    没有此机柜
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block log %}
+    <div class="row">
+        <div class="col-md-7" style="line-height: 79px">
+            <button type="button" class="btn btn-primary" id="bulk_remove_cabinet" >批量删除
+            </button>
+        </div>
+        <div class="col-md-5">
+            {#    分页#}
+            {% include 'dc_info/incloud/page.html' %}
+        </div>
+    </div>
+{% endblock log %}
+
+{% block motai-title %}
+    确认删除以下机柜？
+{% endblock motai-title %}
+
+{% block motai-body %}
+    <div class="row">
+        <div class="col-md-12 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>数据中心</th>
+                    <th>机房</th>
+                    <th>机柜编号</th>
+                    <th>所属客户</th>
+                </tr>
+                </thead>
+                <tbody id="show_remove_cabinet">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock motai-body %}
+
+{% block motai-btn %}
+    <button type="button" class="btn btn-danger" id="remove_cabinet_btn">确认删除</button>
+{% endblock motai-btn %}

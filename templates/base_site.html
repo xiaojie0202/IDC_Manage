@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% endblock title %}
+{% block style %}{% endblock style %}
+{% block script %}{% endblock script %}
+{% block boby %}
+    <div id="wrapper">
+        {#        导航#}
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="brand" style="padding: 15px 39px">
+                <a href="base_site.html"><img src="{% static 'assets/img/logo-dark.png' %}" alt="xiaojie Logo"
+                                              class="img-responsive logo"></a>
+                {#				<a href="/">IDC资产管理系统</a>#}
+            </div>
+            <div class="container-fluid" style="background-color: #ffffff">
+                <div class="navbar-btn" style="margin-top: 0; margin-bottom: 0; padding: 10px 0">
+                    <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i>
+                    </button>
+                </div>
+                <form class="navbar-form navbar-left">
+                    <div class="input-group">
+                        <input type="text" value="" class="form-control" placeholder="设备SN号，或者IP">
+                        <span class="input-group-btn"><button type="button" class="btn btn-primary">Go</button></span>
+                    </div>
+                </form>
+                <div id="navbar-menu">
+                    <ul class="nav navbar-nav navbar-right">
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="{% static 'assets/img/user.png' %}" class="img-circle" alt="Avatar">
+                                <span>{{ request.user.last_name }}{{ request.user.first_name }}</span>
+                                <i class="icon-submenu lnr lnr-chevron-down"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% block usermenu %}
+                                    {% endblock usermenu %}
+                                <li><a href="{% url 'logout' %}"><i class="lnr lnr-exit"></i> <span>Logout</span></a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {#        菜单#}
+        <div id="sidebar-nav" class="sidebar" style="padding-top: 55px">
+            <div class="sidebar-scroll">
+                <nav>
+                    <ul class="nav">
+                        {% block menu_list %}
+                        {% endblock menu_list %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <!-- END LEFT SIDEBAR -->
+        <!-- 内容 -->
+        <div class="main" style="padding-top: 45px">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+
+                    {% block context %}
+                        {% block aphorism %}
+                        {% endblock aphorism %}
+                        <div class="panel panel-headline">
+
+                            <div class="panel-body">
+
+                                {% block panel-body %}
+
+                                {% endblock panel-body %}
+                            </div>
+                        </div>
+                    {% endblock context %}
+
+                    {% block log %}{% endblock log %}
+                </div>
+            </div>
+
+            <footer>
+                <div class="container-fluid">
+                    <p class="copyright">Copyright &copy; 2017 by小杰 All rights reserved</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+{#    莫泰对话框#}
+    {% block motai %}
+
+    {% endblock motai %}
+{% endblock boby %}
