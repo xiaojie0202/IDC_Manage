@@ -60,8 +60,8 @@ function createPortInfoForm() {
                 });
                 $('#portinfo_panel').append(
                     '<div class="form-inline">\n' +
-                    '<div class="form-group col-md-1"><span>互联信息#' + setval + '：</span></div>\n' +
-                    '<div class="form-group"><label for="id_port-' + formcount + '-self_equipment_port">本端端口号:</label>\n' +
+                    '<div class="form-group col-md-12"><div class="pull-left"><span style="padding: 0">互联信息#' + setval + '：</span></div></div>\n' +
+                    '<div class="form-group" style="padding-left: 2%"><label for="id_port-' + formcount + '-self_equipment_port">本端端口号:</label>\n' +
                     '<input type="text" name="port-' + formcount + '-self_equipment_port" class="form-control" maxlength="32" id="id_port-' + formcount + '-self_equipment_port"></div>\n' +
                     '<div class="form-group"><label for="id_port-' + formcount + '-up_equipment">上联设备:</label>\n' +
                     '<select name="port-' + formcount + '-dcname" class="form-control" id="id_port-' + formcount + '-dcname" onchange="getDcChange($(this))">' + dcOption + '</select>' +

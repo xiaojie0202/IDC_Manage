@@ -103,6 +103,7 @@
                                 </div>
                                 {{ form.id }}
                                 {% if ipaddr_form.can_delete %}
+                                    {{ form.DELETE.label }}
                                     {{ form.DELETE }}
                                 {% endif %}
 
@@ -131,11 +132,12 @@
                                     </div>
                                     {% if portinfo_form.can_delete %}
                                         <div class="pull-right">
+                                            {{ form.DELETE.label }}
                                             {{ form.DELETE }}
                                         </div>
                                     {% endif %}
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" style="padding-left: 2%">
                                     <label for="{{ form.self_equipment_port.auto_id }}">本端端口号:</label>
                                     {{ form.self_equipment_port }}{{ form.self_equipment_port.errors.0 }}
                                 </div>
