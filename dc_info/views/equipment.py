@@ -224,10 +224,12 @@ def edit_equipment(request, dcname, idcname, equipment_id):
     context = {}
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
+    # IP地址的Formset表单
     IpAddressFormSet = modelformset_factory(
         model=models.IpAddress,
         form=model_forms.IpAddressForms,
         can_delete=True)
+    # 端口信息的Formset表单
     PortInfoFormSet = modelformset_factory(
         model=models.PortInfo,
         form=model_forms.PortInfoForms,
@@ -237,6 +239,7 @@ def edit_equipment(request, dcname, idcname, equipment_id):
     context['dcname'] = dcname
     context['idcname'] = idcname
 
+    # 获取要编辑的设备
     equipment_obj = models.Equipmen.objects.get(id=int(equipment_id))
 
     if request.method == 'GET':
@@ -271,12 +274,16 @@ def edit_equipment(request, dcname, idcname, equipment_id):
         if equipment_form.is_valid() and ipaddr_form.is_valid() and portinfo_form.is_valid():
             eq_obj = equipment_form.save()
             ip_obj = ipaddr_form.save(commit=False)
+            # 循环需要删除的IP地址信息
             for i in ipaddr_form.deleted_objects:
                 i.delete()
             for ip in ip_obj:
                 ip.equipmen = eq_obj
                 ip.save()
             port_obj = portinfo_form.save(commit=False)
+            # 循环需要删除的端口信息
+            for i in portinfo_form.deleted_objects:
+                i.delete()
             for port in port_obj:
                 port.self_equipment = eq_obj
                 port.save()
