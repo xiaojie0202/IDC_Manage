@@ -7,9 +7,18 @@ from django.utils import timezone
 class DcInfo(models.Model):
     '''数据中心信息'''
     name = models.CharField(max_length=64, unique=True, verbose_name='数据中心名称')
-    address = models.CharField(max_length=192, blank=True, null=True, verbose_name='数据中心地址')
+    address = models.CharField(
+        max_length=192,
+        blank=True,
+        null=True,
+        verbose_name='数据中心地址')
     info = models.TextField(verbose_name='数据中心简介', blank=True, null=True)
-    material = models.FileField(verbose_name='机房相关资料', blank=True, null=True, upload_to="%s/" % name)
+    material = models.FileField(
+        verbose_name='机房相关资料',
+        blank=True,
+        null=True,
+        upload_to="%s/" %
+        name)
     phon = models.CharField(max_length=64, verbose_name='机房值班电话')
 
     def __str__(self):
@@ -26,7 +35,12 @@ class IDCInfo(models.Model):
     dc = models.ForeignKey('DcInfo', verbose_name='所属数据中心')
     name = models.CharField(max_length=128, verbose_name='机房名称')
     info = models.TextField(verbose_name='机房简介', blank=True, null=True)
-    principal = models.CharField(max_length=64, verbose_name='机房负责人', blank=True, null=True, editable=True)
+    principal = models.CharField(
+        max_length=64,
+        verbose_name='机房负责人',
+        blank=True,
+        null=True,
+        editable=True)
 
     def __str__(self):
         return self.name
@@ -43,7 +57,11 @@ class Cabinet(models.Model):
     idc = models.ForeignKey('IDCInfo', verbose_name='所属机房')
     number = models.CharField(max_length=64, verbose_name='机柜编号')
     customer = models.ForeignKey('Customer', verbose_name='所属客户')
-    open_date = models.DateField(verbose_name='机柜开通日期', blank=True, null=True, default=timezone.now)
+    open_date = models.DateField(
+        verbose_name='机柜开通日期',
+        blank=True,
+        null=True,
+        default=timezone.now)
 
     def get_occupy(self):
         count = 0
@@ -98,13 +116,19 @@ class Equipmen(models.Model):
     '''设备信息'''
     cabinet = models.ForeignKey('Cabinet', verbose_name='所属机柜')
     equipment_type_choices = ((1, '服务器设备'), (2, '网络设备'))
-    equipment_type = models.PositiveSmallIntegerField(choices=equipment_type_choices, verbose_name='设备类型')
+    equipment_type = models.PositiveSmallIntegerField(
+        choices=equipment_type_choices, verbose_name='设备类型')
     manufacturers = models.CharField(max_length=64, verbose_name='设备厂商')
     model_num = models.CharField(max_length=64, verbose_name='设备型号')
     serial_num = models.CharField(max_length=128, verbose_name='设备SN号')
     equipment_u = models.PositiveSmallIntegerField(verbose_name='设备U数')
-    place_u = models.PositiveSmallIntegerField(verbose_name='所在机柜U数', blank=True, null=True)
-    up_date = models.DateField(verbose_name='上架日期', blank=True, null=True, default=timezone.now)
+    place_u = models.PositiveSmallIntegerField(
+        verbose_name='所在机柜U数', blank=True, null=True)
+    up_date = models.DateField(
+        verbose_name='上架日期',
+        blank=True,
+        null=True,
+        default=timezone.now)
     customer = models.ForeignKey('Customer', verbose_name='所属客户')
     node = models.TextField(verbose_name='设备信息描述', blank=True, null=True)
 
@@ -139,7 +163,8 @@ class Equipmen(models.Model):
     get_dc.short_description = '数据中心'
 
     def __str__(self):
-        return "%s-%s:%s" % (self.manufacturers, self.model_num, self.serial_num)
+        return "%s-%s:%s" % (self.manufacturers,
+                             self.model_num, self.serial_num)
 
     class Meta:
         unique_together = ('cabinet', 'serial_num')
@@ -151,10 +176,17 @@ class Equipmen(models.Model):
 class IpAddress(models.Model):
     '''IP地址细信息'''
     equipmen = models.ForeignKey('Equipmen', verbose_name='设备')
-    ipaddre = models.GenericIPAddressField(protocol='IPV4', verbose_name='IP地址')
-    netmask = models.GenericIPAddressField(protocol='IPV4', null=True, blank=True, verbose_name='子网掩码')
-    gateway = models.GenericIPAddressField(protocol='IPV4', null=True, blank=True, verbose_name='网关地址')
-    tags = models.CharField(max_length=64, verbose_name='IP标签', blank=True, null=True)
+    ipaddre = models.GenericIPAddressField(
+        protocol='IPV4', verbose_name='IP地址')
+    netmask = models.GenericIPAddressField(
+        protocol='IPV4', null=True, blank=True, verbose_name='子网掩码')
+    gateway = models.GenericIPAddressField(
+        protocol='IPV4', null=True, blank=True, verbose_name='网关地址')
+    tags = models.CharField(
+        max_length=64,
+        verbose_name='IP标签',
+        blank=True,
+        null=True)
 
     def __str__(self):
         return '%s' % self.ipaddre
@@ -168,13 +200,22 @@ class IpAddress(models.Model):
 
 class PortInfo(models.Model):
     '''设备端口对应信息'''
-    self_equipment = models.ForeignKey('Equipmen', verbose_name="本端设备", related_name="self_equipment")
+    self_equipment = models.ForeignKey(
+        'Equipmen',
+        verbose_name="本端设备",
+        related_name="self_equipment")
     self_equipment_port = models.CharField(max_length=32, verbose_name="本端端口号")
-    up_equipment = models.ForeignKey('Equipmen', verbose_name="上联设备", related_name="up_equipment")
+    up_equipment = models.ForeignKey(
+        'Equipmen',
+        verbose_name="上联设备",
+        related_name="up_equipment")
     up_equipment_port = models.CharField(max_length=32, verbose_name="上联端口号")
 
     def __str__(self):
-        return "%s : %s-%s : %s" % (self.self_equipment, self.self_equipment_port, self.up_equipment, self.up_equipment_port)
+        return "%s : %s-%s : %s" % (self.self_equipment,
+                                    self.self_equipment_port,
+                                    self.up_equipment,
+                                    self.up_equipment_port)
 
     class Meta:
         db_table = 'portinfo'
@@ -185,16 +226,29 @@ class PortInfo(models.Model):
 class Inventory(models.Model):
     '''库存信息'''
     idc = models.ForeignKey('IDCInfo', verbose_name='所属机房')
-    place = models.CharField(max_length=128, verbose_name='位置', blank=True, null=True)
+    place = models.CharField(
+        max_length=128,
+        verbose_name='位置',
+        blank=True,
+        null=True)
     name = models.CharField(max_length=128, verbose_name='物品名称')
     name_num = models.CharField(max_length=128, verbose_name='物品型号')
-    sn = models.CharField(max_length=128, verbose_name='SN号', blank=True, null=True)
+    sn = models.CharField(
+        max_length=128,
+        verbose_name='SN号',
+        blank=True,
+        null=True)
     count = models.PositiveIntegerField(verbose_name='物品数量')
     customer = models.ForeignKey('Customer', verbose_name='所属客户')
     node = models.TextField(verbose_name='物品描述', blank=True, null=True)
-    post_number = models.CharField(verbose_name='物流单号', blank=True, null=True, max_length=128)
-    status_choices = ((0,'损坏'), (1, '完好'))
-    status = models.PositiveSmallIntegerField(choices=status_choices, verbose_name='状态', default=1)
+    post_number = models.CharField(
+        verbose_name='物流单号',
+        blank=True,
+        null=True,
+        max_length=128)
+    status_choices = ((0, '损坏'), (1, '完好'))
+    status = models.PositiveSmallIntegerField(
+        choices=status_choices, verbose_name='状态', default=1)
 
     def get_status(self):
         if self.status:
@@ -216,7 +270,8 @@ class CabinetLog(models.Model):
     '机柜操作日志'
     handle_user = models.ForeignKey(User, verbose_name='操作用户')
     handle_type_choices = ((0, '关闭'), (1, '开通'),)
-    handle_type = models.PositiveSmallIntegerField(choices=handle_type_choices, verbose_name='操作类型')
+    handle_type = models.PositiveSmallIntegerField(
+        choices=handle_type_choices, verbose_name='操作类型')
     date = models.DateField(verbose_name='日期')  # 机柜开关日期
     handle_date = models.DateTimeField(verbose_name='操作日期', auto_now_add=True)
     cabinet_dc = models.ForeignKey(DcInfo, verbose_name='机柜所属数据中心')
@@ -234,9 +289,17 @@ class CabinetLog(models.Model):
 
     def __str__(self):
         if self.handle_type == 0:
-            return '%s%s%s-%s-%s' % (self.customer, '关闭', self.cabinet_dc, self.cabinet_idc, self.cabinet_number)
+            return '%s%s%s-%s-%s' % (self.customer,
+                                     '关闭',
+                                     self.cabinet_dc,
+                                     self.cabinet_idc,
+                                     self.cabinet_number)
         else:
-            return '%s%s%s-%s-%s' % (self.customer, '开通', self.cabinet_dc, self.cabinet_idc, self.cabinet_number)
+            return '%s%s%s-%s-%s' % (self.customer,
+                                     '开通',
+                                     self.cabinet_dc,
+                                     self.cabinet_idc,
+                                     self.cabinet_number)
 
     class Meta:
         db_table = 'cabinetlog'
@@ -248,19 +311,29 @@ class EquipmenLog(models.Model):
     '''设备操作日志'''
     handle_user = models.ForeignKey(User, verbose_name='操作用户')
     handle_type_choices = ((0, '下架'), (1, '上架'),)
-    handle_type = models.PositiveSmallIntegerField(choices=handle_type_choices, verbose_name='操作类型')
+    handle_type = models.PositiveSmallIntegerField(
+        choices=handle_type_choices, verbose_name='操作类型')
     handle_date = models.DateTimeField(verbose_name='操作日期')
     customer = models.ForeignKey('Customer', verbose_name='所属客户')
     cabinet = models.CharField(max_length=64, verbose_name='下架机柜')
     model_num = models.CharField(max_length=64, verbose_name='设备型号')
     serial_num = models.CharField(max_length=128, verbose_name='设备SN号')
-    ipaddre = models.GenericIPAddressField(protocol='IPV4', null=True, blank=True, verbose_name='IP地址')
+    ipaddre = models.GenericIPAddressField(
+        protocol='IPV4', null=True, blank=True, verbose_name='IP地址')
 
     def __str__(self):
         if self.handle_type:
-            return '%s%s%s:%s-%s' % (self.customer, '上架', self.model_num, self.serial_num, self.ipaddre)
+            return '%s%s%s:%s-%s' % (self.customer,
+                                     '上架',
+                                     self.model_num,
+                                     self.serial_num,
+                                     self.ipaddre)
         else:
-            return '%s%s%s:%s-%s' % (self.customer, '下架', self.model_num, self.serial_num, self.ipaddre)
+            return '%s%s%s:%s-%s' % (self.customer,
+                                     '下架',
+                                     self.model_num,
+                                     self.serial_num,
+                                     self.ipaddre)
 
     class Meta:
         db_table = 'equipmenlog'
@@ -272,9 +345,11 @@ class AbnormalInfo(models.Model):
     equipment = models.ForeignKey('Equipmen', verbose_name="异常设备")
     info = models.TextField(verbose_name="异常信息")
     schedule_choices = ((0, "未处理"), (1, '已处理'))
-    schedule = models.PositiveSmallIntegerField(verbose_name="进度", choices=schedule_choices)
+    schedule = models.PositiveSmallIntegerField(
+        verbose_name="进度", choices=schedule_choices)
     find_time = models.DateTimeField(verbose_name="发现时间", default=timezone.now)
-    handel_time = models.DateTimeField(verbose_name='处理时间', blank=True, null=True)
+    handel_time = models.DateTimeField(
+        verbose_name='处理时间', blank=True, null=True)
 
     class Meta:
         db_table = "abnormalinfo"

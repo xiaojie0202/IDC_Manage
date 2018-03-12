@@ -13,7 +13,8 @@ def index(request):
     dc_obj.idc_count = models.IDCInfo.objects.all().count()
     dc_obj.cabinet_count = models.Cabinet.objects.all().count()
     dc_obj.equipment_count = models.Equipmen.objects.all().count()
-    return render(request, 'dc_info/index.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj})
+    return render(request, 'dc_info/index.html',
+                  {"dc_obj": dc_obj, 'customer_obj': customer_obj})
 
 
 # 机柜增减折线图需要的数据
@@ -31,7 +32,7 @@ def ajax_cabinet_broken_line(request):
             "equipment_value": []
         }
         try:
-        # 获取月份
+            # 获取月份
             start_year = models.CabinetLog.objects.all().order_by('date').first().date.year
         except Exception:
             return HttpResponse(json.dumps(data))
@@ -44,14 +45,15 @@ def ajax_cabinet_broken_line(request):
         for i in data["dc"]:
             data["series"].append({"name": i, "type": "line"})
         # options:
-        for index,year in enumerate(data["year"]):
+        for index, year in enumerate(data["year"]):
             ser = {"title": {"text": "%s年机柜增减折线图" % year}, "series": []}
             for name in data["dc"]:
                 dc_obj = models.DcInfo.objects.get(name=name)
                 log_set = dc_obj.cabinetlog_set
                 cabinet_count = {"data": []}
                 if index == 0:
-                    cabinet_count_list = {"value": models.Cabinet.objects.filter(idc__in=dc_obj.idcinfo_set.all()).count(), "name": name}
+                    cabinet_count_list = {"value": models.Cabinet.objects.filter(
+                        idc__in=dc_obj.idcinfo_set.all()).count(), "name": name}
                     data["cabinet_count_list"].append(cabinet_count_list)
                 count = 0
                 for month in range(1, 13):
@@ -62,7 +64,8 @@ def ajax_cabinet_broken_line(request):
                     else:
                         if month == 1:
                             try:
-                                count = log_set.filter(date__year=int(year)-1).order_by('id').last().dc_surplus_count
+                                count = log_set.filter(
+                                    date__year=int(year) - 1).order_by('id').last().dc_surplus_count
                             except Exception as e:
                                 count = 0
                         cabinet_count["data"].append(count)
@@ -79,5 +82,6 @@ def ajax_cabinet_broken_line(request):
             cabinet_value = customet_obj.cabinet_set.count()
             equipment_count = customet_obj.equipmen_set.count()
             data["customer_value"].append({"value": cabinet_value, "name": i})
-            data["equipment_value"].append({"value": equipment_count, "name": i})
+            data["equipment_value"].append(
+                {"value": equipment_count, "name": i})
         return HttpResponse(json.dumps(data))

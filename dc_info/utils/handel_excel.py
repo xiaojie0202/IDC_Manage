@@ -4,7 +4,6 @@ import openpyxl
 import datetime
 
 
-
 def handel_cabinet(file):
     cabinet_num = []
     customer = []
@@ -21,10 +20,15 @@ def handel_cabinet(file):
                 customer.append(myworksheet.cell(row=row, column=col).value)
             elif col == 3:
                 open_date.append(myworksheet.cell(row=row, column=col).value)
-    cabinet_dict = {'cabinet_num': cabinet_num, 'customer': customer, 'open_date': open_date}
+    cabinet_dict = {
+        'cabinet_num': cabinet_num,
+        'customer': customer,
+        'open_date': open_date}
     return cabinet_dict
 
 # 处理用户上传的批量导入机柜Excel表格
+
+
 def handel_import_cabinet(file):
     wb = openpyxl.load_workbook(file)
     sheet = wb.active
@@ -42,8 +46,9 @@ def handel_import_cabinet(file):
                 dcname = value
             if cell_num == "B":
                 try:
-                    cabinet_obj['idc'] = models.IDCInfo.objects.get(dc__name=dcname, name=value)
-                except  Exception as e:
+                    cabinet_obj['idc'] = models.IDCInfo.objects.get(
+                        dc__name=dcname, name=value)
+                except Exception as e:
                     info['status'] = False
                     info['erro'] = "此机房不存在%s-%s,(%s)" % (dcname, value, e)
                     break
@@ -51,7 +56,8 @@ def handel_import_cabinet(file):
                 cabinet_obj['number'] = value
             if cell_num == "D":
                 try:
-                    cabinet_obj['customer'] = models.Customer.objects.get(name=value)
+                    cabinet_obj['customer'] = models.Customer.objects.get(
+                        name=value)
                 except Exception as e:
                     info['status'] = False
                     info['erro'] = "%s此客户不存在,(%s)" % (value, e)
@@ -71,9 +77,13 @@ def handel_import_cabinet(file):
     return info
 
 # 处理用户上传的批量导入设备excel表格
+
+
 def handel_import_equipment(file, dcname, idcname):
     erro = {'status': True}
-    cabinet_set = models.DcInfo.objects.get(name__contains=dcname).idcinfo_set.get(name__contains=idcname).cabinet_set
+    cabinet_set = models.DcInfo.objects.get(
+        name__contains=dcname).idcinfo_set.get(
+        name__contains=idcname).cabinet_set
     wb = openpyxl.load_workbook(filename=file)
     sheet = wb.active
     # 读取一列
@@ -110,7 +120,8 @@ def handel_import_equipment(file, dcname, idcname):
                 if value:
                     if cel_name == 'A':
                         try:
-                            equipment_obj['cabinet'] = cabinet_set.get(number=value)
+                            equipment_obj['cabinet'] = cabinet_set.get(
+                                number=value)
                         except Exception as e:
                             erro['erro'] = '%s机柜不存在,(%s)' % (value, e)
                             erro['status'] = False
@@ -134,14 +145,16 @@ def handel_import_equipment(file, dcname, idcname):
                         equipment_obj['equipment_u'] = value
                     if cel_name == 'H':
                         try:
-                            customer = models.Customer.objects.get(name__contains=value)
+                            customer = models.Customer.objects.get(
+                                name__contains=value)
                             equipment_obj['customer'] = customer
                         except Exception as e:
                             erro['erro'] = '%s客户不存在,(%s)' % (value, e)
                             erro['status'] = False
                     if cel_name == 'I':
                         try:
-                            equipment_obj['up_date'] = timezone.datetime.date(value)
+                            equipment_obj['up_date'] = timezone.datetime.date(
+                                value)
                         except Exception as e:
                             erro['erro'] = '%s日期格式不正确,(%s)' % (value, e)
                             erro['status'] = False
@@ -198,7 +211,8 @@ def handel_import_inventory(file, dcname, idcname):
                 inventory_obj['count'] = value
             if cell_num == 'F':
                 try:
-                    inventory_obj['customer'] = models.Customer.objects.get(name=value)
+                    inventory_obj['customer'] = models.Customer.objects.get(
+                        name=value)
                 except Exception as e:
                     info['status'] = False
                     info['erro'] = '%s客户不存在' % value
@@ -217,7 +231,8 @@ def handel_import_inventory(file, dcname, idcname):
                     info['erro'] = '%s 状态字段不正确' % value
                     break
         if info['status']:
-            inventory_obj['idc'] = models.DcInfo.objects.get(name=dcname).idcinfo_set.get(name=idcname)
+            inventory_obj['idc'] = models.DcInfo.objects.get(
+                name=dcname).idcinfo_set.get(name=idcname)
             try:
                 inventory = models.Inventory.objects.create(**inventory_obj)
             except Exception as e:

@@ -20,19 +20,29 @@ def get_inventory(request, dcname, idcname):
     filter = request.GET.get('filter', None)  # 获取过滤信息
     addinfo = request.GET.get('add', None)  # 添加库存的时候跳转过来并传递add参数
     search_inventory = request.GET.get('search')
-    context = {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'dcname': dcname, 'idcname': idcname, 'add': addinfo}
-    inventory_queryset = models.DcInfo.objects.get(name=dcname).idcinfo_set.get(name=idcname).inventory_set
+    context = {
+        "dc_obj": dc_obj,
+        'customer_obj': customer_obj,
+        'dcname': dcname,
+        'idcname': idcname,
+        'add': addinfo}
+    inventory_queryset = models.DcInfo.objects.get(
+        name=dcname).idcinfo_set.get(
+        name=idcname).inventory_set
     if search_inventory:
-        inventory_queryset = inventory_queryset.filter(Q(sn__icontains=search_inventory) | Q(post_number__icontains=search_inventory)).order_by('id')
+        inventory_queryset = inventory_queryset.filter(Q(sn__icontains=search_inventory) | Q(
+            post_number__icontains=search_inventory)).order_by('id')
     else:
         if filter == 'all' or not filter:
             inventory_queryset = inventory_queryset.all().order_by('id')
         else:
             filter = int(filter)
-            inventory_queryset = inventory_queryset.filter(customer=customer_obj.get(pk=filter)).order_by('id')
+            inventory_queryset = inventory_queryset.filter(
+                customer=customer_obj.get(pk=filter)).order_by('id')
 
     if current_page == 'all':
-        paginator = CustomPaginator(1, 11, inventory_queryset, inventory_queryset.count())
+        paginator = CustomPaginator(
+            1, 11, inventory_queryset, inventory_queryset.count())
     else:
         paginator = CustomPaginator(current_page, 11, inventory_queryset, 20)
     try:
@@ -63,9 +73,13 @@ def update_inventory_count(request, operation):
     if request.method == 'POST':
         inventory_id = request.POST.get('inventory_id')
         if operation == 'add':
-            models.Inventory.objects.filter(pk=int(inventory_id)).update(count=F('count') + 1)
+            models.Inventory.objects.filter(
+                pk=int(inventory_id)).update(
+                count=F('count') + 1)
         elif operation == 'minus':
-            models.Inventory.objects.filter(pk=int(inventory_id)).update(count=F('count') - 1)
+            models.Inventory.objects.filter(
+                pk=int(inventory_id)).update(
+                count=F('count') - 1)
         return HttpResponse(json.dumps({'status': True}))
 
 
@@ -80,7 +94,11 @@ def add_inventory(request, dcname, idcname):
     context['dcname'] = dcname
     context['idcname'] = idcname
     if request.method == 'GET':
-        inventory_form = model_forms.InventoryForms(initial={'idc': models.DcInfo.objects.get(name=dcname).idcinfo_set.get(name=idcname)})
+        inventory_form = model_forms.InventoryForms(
+            initial={
+                'idc': models.DcInfo.objects.get(
+                    name=dcname).idcinfo_set.get(
+                    name=idcname)})
         context['inventory_form'] = inventory_form
         return render(request, 'dc_info/edit_inventory.html', context)
     if request.method == 'POST':
@@ -88,7 +106,9 @@ def add_inventory(request, dcname, idcname):
         context['inventory_form'] = inventory_form
         if inventory_form.is_valid():
             obj = inventory_form.save()
-            return redirect('/inventory/%s/%s/?add=%s' % (dcname, idcname, obj))
+            return redirect(
+                '/inventory/%s/%s/?add=%s' %
+                (dcname, idcname, obj))
         else:
             return render(request, 'dc_info/edit_inventory.html', context)
 
@@ -104,15 +124,21 @@ def edit_inventory(request, dcname, idcname, inventory_id):
     context['dcname'] = dcname
     context['idcname'] = idcname
     if request.method == 'GET':
-        inventory_form = model_forms.InventoryForms(instance=models.Inventory.objects.get(pk=int(inventory_id)))
+        inventory_form = model_forms.InventoryForms(
+            instance=models.Inventory.objects.get(
+                pk=int(inventory_id)))
         context['inventory_form'] = inventory_form
         return render(request, 'dc_info/edit_inventory.html', context)
     if request.method == 'POST':
-        inventory_form = model_forms.InventoryForms(request.POST, instance=models.Inventory.objects.get(pk=int(inventory_id)))
+        inventory_form = model_forms.InventoryForms(
+            request.POST, instance=models.Inventory.objects.get(
+                pk=int(inventory_id)))
         context['inventory_form'] = inventory_form
         if inventory_form.is_valid():
             obj = inventory_form.save()
-            return redirect('/inventory/%s/%s/?add=%s' % (dcname, idcname, obj))
+            return redirect(
+                '/inventory/%s/%s/?add=%s' %
+                (dcname, idcname, obj))
         else:
             return render(request, 'dc_info/edit_inventory.html', context)
 
@@ -122,7 +148,11 @@ def edit_inventory(request, dcname, idcname, inventory_id):
 def bulk_import_inventory(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
-    context = {'dc_obj': dc_obj, 'customer_obj': customer_obj, 'dcname': dcname, 'idcname': idcname}
+    context = {
+        'dc_obj': dc_obj,
+        'customer_obj': customer_obj,
+        'dcname': dcname,
+        'idcname': idcname}
 
     if request.method == 'GET':
         return render(request, 'dc_info/import_inventory.html', context)
@@ -132,7 +162,8 @@ def bulk_import_inventory(request, dcname, idcname):
         if inventory_excel:
             file_suffix = os.path.splitext(inventory_excel.name)[1]
             if file_suffix in ('.xls', '.xlsx'):
-                info = handel_excel.handel_import_inventory(inventory_excel.file, dcname, idcname)
+                info = handel_excel.handel_import_inventory(
+                    inventory_excel.file, dcname, idcname)
             else:
                 info['status'] = False
                 info['erro'] = '上传文件只能是 .xls 和 .xlsx 格式'

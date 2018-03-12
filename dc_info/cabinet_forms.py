@@ -10,9 +10,13 @@ class CreateCabinetForms(forms.Form):
     # customer = models.ForeignKey('Customer', verbose_name='所属客户')
     # open_date = models.DateField(verbose_name='机柜开通日期', blank=True, null=True, default=datetime.datetime.now().date())
     idc = fields.CharField(required=True)
-    number = fields.CharField(required=True,
-                              label='<label for="id_number" class="col-sm-2 control-label">机柜编号</label>',
-                              widget=forms.TextInput(attrs={'placeholder': "机柜编号", 'class': 'form-control'}))
+    number = fields.CharField(
+        required=True,
+        label='<label for="id_number" class="col-sm-2 control-label">机柜编号</label>',
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': "机柜编号",
+                'class': 'form-control'}))
     customer = fields.CharField(
         required=True,
         widget=forms.Select(attrs={'class': "form-control"}),
@@ -24,4 +28,5 @@ class CreateCabinetForms(forms.Form):
     def __init__(self, *args, **kwargs):
         super(CreateCabinetForms, self).__init__(*args, **kwargs)
         # self.customer.widget = models.Customer.objects.values_list('id', 'name')
-        self.fields['customer'].widget.choices = models.Customer.objects.values_list('id', 'name')
+        self.fields['customer'].widget.choices = models.Customer.objects.values_list(
+            'id', 'name')

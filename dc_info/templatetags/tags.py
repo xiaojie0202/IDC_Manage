@@ -9,7 +9,7 @@ def minttags(filter):
     if not filter:
         return ''
     else:
-        ele = '&filter=%s'%filter
+        ele = '&filter=%s' % filter
         return mark_safe(ele)
 
 
@@ -20,7 +20,7 @@ def equipment_condition(filter, type):
         for k, v in filter.items():
             ele += "&%s=%s" % (k, v)
     elif type == 'cabinet_id' and filter.get('customer_id'):
-        ele += '&customer_id=%s'% filter.get('customer_id')
+        ele += '&customer_id=%s' % filter.get('customer_id')
     elif type == 'customer_id' and filter.get('cabinet_id'):
         ele += '&cabinet_id=%s' % filter.get('cabinet_id')
     else:
@@ -49,11 +49,9 @@ def customet_cabinet_log(filter, type):
         for k, v in filter.items():
             ele += "&%s=%s" % (k, v)
     elif type == 'cabinet_number' and filter.get('customer'):
-        ele += '<input type="hidden" name="customer" value="%s">' % filter.get('customer')
+        ele += '<input type="hidden" name="customer" value="%s">' % filter.get(
+            'customer')
     else:
         return ''
 
     return mark_safe(ele)
-
-
-

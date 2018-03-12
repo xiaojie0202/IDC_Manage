@@ -18,7 +18,9 @@ import os
 def get_equipmen_info(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
-    cabinet_queryset = models.DcInfo.objects.get(name=dcname).idcinfo_set.get(name=idcname).cabinet_set.all()
+    cabinet_queryset = models.DcInfo.objects.get(
+        name=dcname).idcinfo_set.get(
+        name=idcname).cabinet_set.all()
     current_page = request.GET.get('page', 1)  # 获取用户点击的页码
     cabinet_id = request.GET.get('cabinet_id')
     customer_id = request.GET.get('customer_id')
@@ -30,9 +32,11 @@ def get_equipmen_info(request, dcname, idcname):
             condition['cabinet_id'] = int(cabinet_id)
         if customer_id:
             condition['customer_id'] = int(customer_id)
-        equipmen_obj = models.Equipmen.objects.filter(cabinet__in=cabinet_queryset, **condition).order_by('cabinet')
+        equipmen_obj = models.Equipmen.objects.filter(
+            cabinet__in=cabinet_queryset, **condition).order_by('cabinet')
     else:
-        equipmen_obj = models.Equipmen.objects.filter(cabinet__in=cabinet_queryset).order_by('cabinet').filter(Q(ipaddress__ipaddre=search_cabinet) | Q(serial_num__icontains=search_cabinet))
+        equipmen_obj = models.Equipmen.objects.filter(cabinet__in=cabinet_queryset).order_by(
+            'cabinet').filter(Q(ipaddress__ipaddre=search_cabinet) | Q(serial_num__icontains=search_cabinet))
     if current_page == 'all':
         paginator = CustomPaginator(1, 11, equipmen_obj, equipmen_obj.count())
     else:
@@ -44,7 +48,16 @@ def get_equipmen_info(request, dcname, idcname):
         data_list = paginator.page(1)
     except EmptyPage:
         data_list = paginator.page(paginator.num_pages)
-    return render(request, 'dc_info/equipmeninfo.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'dcname': dcname, 'idcname': idcname, 'page_list': data_list, 'cabinet_queryset': cabinet_queryset, 'filter': condition, 'addequipment': addequipment})
+    return render(request,
+                  'dc_info/equipmeninfo.html',
+                  {"dc_obj": dc_obj,
+                   'customer_obj': customer_obj,
+                   'dcname': dcname,
+                   'idcname': idcname,
+                   'page_list': data_list,
+                   'cabinet_queryset': cabinet_queryset,
+                   'filter': condition,
+                   'addequipment': addequipment})
 
 
 # 删除设备
@@ -61,7 +74,8 @@ def delete_equipment(request):
             # 添加设备删除日志
             add_equipment_log(request, 0, equipment_obj)
             equipment_obj.delete()
-        return HttpResponse(json.dumps({'status': True, 'delete_list': delete_list, 'delete_id': idlist}))
+        return HttpResponse(json.dumps(
+            {'status': True, 'delete_list': delete_list, 'delete_id': idlist}))
 
 
 # 增加设备信息
@@ -70,24 +84,33 @@ def create_equipment(request, dcname, idcname):
     context = {}
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
-    IpAddressFormSet = modelformset_factory(model=models.IpAddress, form=model_forms.IpAddressForms)
-    PortInfoFormSet = modelformset_factory(model=models.PortInfo, form=model_forms.PortInfoForms)
+    IpAddressFormSet = modelformset_factory(
+        model=models.IpAddress,
+        form=model_forms.IpAddressForms)
+    PortInfoFormSet = modelformset_factory(
+        model=models.PortInfo,
+        form=model_forms.PortInfoForms)
     context['dc_obj'] = dc_obj
     context['customer_obj'] = customer_obj
     context['dcname'] = dcname
     context['idcname'] = idcname
     if request.method == 'GET':
-        cabinet_chuices = models.Cabinet.objects.filter(idc__name=idcname).values_list('id', 'number')
+        cabinet_chuices = models.Cabinet.objects.filter(
+            idc__name=idcname).values_list('id', 'number')
         equipment_form = model_forms.EquipmentForms(cabinet_chuices)
-        ipaddr_form = IpAddressFormSet(queryset=models.IpAddress.objects.none(), prefix='ip')
-        portinfo_form = PortInfoFormSet(queryset=models.PortInfo.objects.none(), prefix='port')
+        ipaddr_form = IpAddressFormSet(
+            queryset=models.IpAddress.objects.none(), prefix='ip')
+        portinfo_form = PortInfoFormSet(
+            queryset=models.PortInfo.objects.none(), prefix='port')
         context['equipment_form'] = equipment_form
         context['ipaddr_form'] = ipaddr_form
         context['portinfo_form'] = portinfo_form
         return render(request, 'dc_info/create_equipment.html', context)
     elif request.method == 'POST':
-        cabinet_chuices = models.Cabinet.objects.filter(idc__name=idcname).values_list('id', 'number')
-        equipment_form = model_forms.EquipmentForms(cabinet_chuices, request.POST)
+        cabinet_chuices = models.Cabinet.objects.filter(
+            idc__name=idcname).values_list('id', 'number')
+        equipment_form = model_forms.EquipmentForms(
+            cabinet_chuices, request.POST)
         ipaddr_form = IpAddressFormSet(request.POST, prefix='ip')
         portinfo_form = PortInfoFormSet(request.POST, prefix='port')
         context['equipment_form'] = equipment_form
@@ -105,7 +128,9 @@ def create_equipment(request, dcname, idcname):
                 port.save()
             add_equipment_log(request, 1, eq_obj)
 
-            return redirect('/equipmen/%s/%s/?addequipment=%s' % (dcname, idcname, eq_obj))
+            return redirect(
+                '/equipmen/%s/%s/?addequipment=%s' %
+                (dcname, idcname, eq_obj))
         else:
             return render(request, 'dc_info/create_equipment.html', context)
 
@@ -116,7 +141,12 @@ def import_equipment(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
     if request.method == 'GET':
-        return render(request, 'dc_info/import_equipment.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'dcname': dcname, 'idcname': idcname})
+        return render(request,
+                      'dc_info/import_equipment.html',
+                      {"dc_obj": dc_obj,
+                       'customer_obj': customer_obj,
+                       'dcname': dcname,
+                       'idcname': idcname})
     elif request.method == 'POST':
         equipment_info = {'status': True}
         equipment_file = request.FILES.get('equipment_excel')
@@ -125,7 +155,8 @@ def import_equipment(request, dcname, idcname):
             if file_suffix in ('.xls', '.xlsx'):
                 equipment_list = []
                 try:
-                    equipment_dict, erroinfo = handel_excel.handel_import_equipment(equipment_file.file, dcname, idcname)  # 交给函数出来文件
+                    equipment_dict, erroinfo = handel_excel.handel_import_equipment(
+                        equipment_file.file, dcname, idcname)  # 交给函数出来文件
                 except Exception as e:
                     equipment_info['status'] = False
                     equipment_info['erro'] = 'EXCEL格式不正确,(%s)' % e
@@ -138,7 +169,8 @@ def import_equipment(request, dcname, idcname):
                                 a = models.Equipmen.objects.create(**i)
                             except IntegrityError as e:
                                 equipment_info['status'] = False
-                                equipment_info['erro'] = '%s-设备已经存在，无需添加:%s' % (i.get('serial_num'), e)
+                                equipment_info['erro'] = '%s-设备已经存在，无需添加:%s' % (
+                                    i.get('serial_num'), e)
                                 break
                             else:
                                 equipment_list.append(a)
@@ -146,7 +178,8 @@ def import_equipment(request, dcname, idcname):
                                 for ipaddre in ipaddress_set:
                                     ipaddre['equipmen'] = a
                                     try:
-                                        models.IpAddress.objects.create(**ipaddre)
+                                        models.IpAddress.objects.create(
+                                            **ipaddre)
                                     except Exception as e:
                                         equipment_info['status'] = False
                                         equipment_info['erro'] = 'IP地址不能为空%s' % ipaddre
@@ -155,10 +188,12 @@ def import_equipment(request, dcname, idcname):
                                 for port in portinfo:
                                     port['self_equipment'] = a
                                     try:
-                                        up_equipment = models.Equipmen.objects.get(serial_num=port['up_equipment'])
+                                        up_equipment = models.Equipmen.objects.get(
+                                            serial_num=port['up_equipment'])
                                     except Exception as e:
                                         equipment_info['status'] = False
-                                        equipment_info['erro'] = '%s-上联设备不存在:%s' % (port.get('up_equipment'), e)
+                                        equipment_info['erro'] = '%s-上联设备不存在:%s' % (
+                                            port.get('up_equipment'), e)
                                         break
                                     else:
                                         port['up_equipment'] = up_equipment
@@ -174,7 +209,13 @@ def import_equipment(request, dcname, idcname):
                         equipment_info['status'] = False
                         equipment_info['erro'] = erroinfo['erro']
 
-        return render(request, 'dc_info/import_equipment.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'dcname': dcname, 'idcname': idcname, 'equipment_info': equipment_info})
+        return render(request,
+                      'dc_info/import_equipment.html',
+                      {"dc_obj": dc_obj,
+                       'customer_obj': customer_obj,
+                       'dcname': dcname,
+                       'idcname': idcname,
+                       'equipment_info': equipment_info})
 
 
 # 编辑设备信息
@@ -183,8 +224,14 @@ def edit_equipment(request, dcname, idcname, equipment_id):
     context = {}
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
-    IpAddressFormSet = modelformset_factory(model=models.IpAddress, form=model_forms.IpAddressForms, can_delete=True)
-    PortInfoFormSet = modelformset_factory(model=models.PortInfo, form=model_forms.PortInfoForms, can_delete=True)
+    IpAddressFormSet = modelformset_factory(
+        model=models.IpAddress,
+        form=model_forms.IpAddressForms,
+        can_delete=True)
+    PortInfoFormSet = modelformset_factory(
+        model=models.PortInfo,
+        form=model_forms.PortInfoForms,
+        can_delete=True)
     context['dc_obj'] = dc_obj
     context['customer_obj'] = customer_obj
     context['dcname'] = dcname
@@ -193,19 +240,31 @@ def edit_equipment(request, dcname, idcname, equipment_id):
     equipment_obj = models.Equipmen.objects.get(id=int(equipment_id))
 
     if request.method == 'GET':
-        cabinet_chuices = models.Cabinet.objects.filter(idc__name=idcname).values_list('id', 'number')
-        equipment_form = model_forms.EquipmentForms(cabinet_chuices, instance=equipment_obj)
-        ipaddr_form = IpAddressFormSet(queryset=equipment_obj.ipaddress_set.all(), prefix='ip')
-        portinfo_form = PortInfoFormSet(queryset=equipment_obj.self_equipment.all(), prefix='port')
+        cabinet_chuices = models.Cabinet.objects.filter(
+            idc__name=idcname).values_list('id', 'number')
+        equipment_form = model_forms.EquipmentForms(
+            cabinet_chuices, instance=equipment_obj)
+        ipaddr_form = IpAddressFormSet(
+            queryset=equipment_obj.ipaddress_set.all(), prefix='ip')
+        portinfo_form = PortInfoFormSet(
+            queryset=equipment_obj.self_equipment.all(), prefix='port')
         context['equipment_form'] = equipment_form
         context['ipaddr_form'] = ipaddr_form
         context['portinfo_form'] = portinfo_form
         return render(request, 'dc_info/create_equipment.html', context)
     if request.method == 'POST':
-        cabinet_chuices = models.Cabinet.objects.filter(idc__name=idcname).values_list('id', 'number')
-        equipment_form = model_forms.EquipmentForms(cabinet_chuices, request.POST, instance=equipment_obj)
-        ipaddr_form = IpAddressFormSet(request.POST, queryset=equipment_obj.ipaddress_set.all(), prefix='ip')
-        portinfo_form = PortInfoFormSet(request.POST, queryset=equipment_obj.self_equipment.all(), prefix='port')
+        cabinet_chuices = models.Cabinet.objects.filter(
+            idc__name=idcname).values_list('id', 'number')
+        equipment_form = model_forms.EquipmentForms(
+            cabinet_chuices, request.POST, instance=equipment_obj)
+        ipaddr_form = IpAddressFormSet(
+            request.POST,
+            queryset=equipment_obj.ipaddress_set.all(),
+            prefix='ip')
+        portinfo_form = PortInfoFormSet(
+            request.POST,
+            queryset=equipment_obj.self_equipment.all(),
+            prefix='port')
         context['equipment_form'] = equipment_form
         context['ipaddr_form'] = ipaddr_form
         context['portinfo_form'] = portinfo_form
@@ -221,7 +280,9 @@ def edit_equipment(request, dcname, idcname, equipment_id):
             for port in port_obj:
                 port.self_equipment = eq_obj
                 port.save()
-            return redirect('/equipmen/%s/%s/?addequipment=%s' % (dcname, idcname, equipment_obj))
+            return redirect(
+                '/equipmen/%s/%s/?addequipment=%s' %
+                (dcname, idcname, equipment_obj))
         else:
             return render(request, 'dc_info/create_equipment.html', context)
 
@@ -231,7 +292,12 @@ def edit_equipment(request, dcname, idcname, equipment_id):
 def date_stat(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
-    return render(request, 'dc_info/abnormal.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'dcname': dcname, 'idcname': idcname})
+    return render(request,
+                  'dc_info/abnormal.html',
+                  {"dc_obj": dc_obj,
+                   'customer_obj': customer_obj,
+                   'dcname': dcname,
+                   'idcname': idcname})
 
 
 # 访问客户设备操作日志
@@ -240,7 +306,8 @@ def customer_equipmen_log(request):
     current_page = request.GET.get('page', 1)
     if request.method == 'POST':
         equipment_sn = request.POST.get('equipment_sn')
-        equipment_log_obj = models.EquipmenLog.objects.filter(serial_num=equipment_sn).order_by('handle_date').reverse()
+        equipment_log_obj = models.EquipmenLog.objects.filter(
+            serial_num=equipment_sn).order_by('handle_date').reverse()
     else:
         equipment_log_obj = models.EquipmenLog.objects.all().order_by('handle_date').reverse()
 
@@ -251,7 +318,9 @@ def customer_equipmen_log(request):
         data_list = paginator.page(1)
     except EmptyPage:
         data_list = paginator.page(paginator.num_pages)
-    return render(request, 'dc_info/customer_equipmen_log.html', {'page_list': data_list})
+    return render(request,
+                  'dc_info/customer_equipmen_log.html',
+                  {'page_list': data_list})
 
 
 # 网络设备端口处理函数
@@ -269,7 +338,8 @@ def show_network_port(request):
         equipment_id = request.POST.get('id')
         equipment_obj = models.Equipmen.objects.get(id=int(equipment_id))
         self_cabinet = '%s' % equipment_obj.cabinet
-        self_mode = '%s%s' % (equipment_obj.manufacturers, equipment_obj.model_num)
+        self_mode = '%s%s' % (equipment_obj.manufacturers,
+                              equipment_obj.model_num)
         self_sn = equipment_obj.serial_num
 
         for i in equipment_obj.self_equipment.all():
@@ -277,13 +347,15 @@ def show_network_port(request):
             self_port = i.self_equipment_port
             other_cabiner, other_mode, other_sn = handel_other_obj(other_obj)
             other_port = i.up_equipment_port
-            data.append([self_cabinet, self_mode, self_sn, self_port, other_cabiner, other_mode, other_sn, other_port])
+            data.append([self_cabinet, self_mode, self_sn, self_port,
+                         other_cabiner, other_mode, other_sn, other_port])
         for i in equipment_obj.up_equipment.all():
             other_obj = i.self_equipment
             self_port = i.up_equipment_port
             other_cabiner, other_mode, other_sn = handel_other_obj(other_obj)
             other_port = i.self_equipment_port
-            data.append([self_cabinet, self_mode, self_sn, self_port, other_cabiner, other_mode, other_sn, other_port])
+            data.append([self_cabinet, self_mode, self_sn, self_port,
+                         other_cabiner, other_mode, other_sn, other_port])
         return HttpResponse(json.dumps({'status': True, 'data': data}))
 
 
@@ -293,13 +365,25 @@ def equipment_getinfo(request, name):
     info_id = request.POST['id']
     data = None
     if name == 'idc':
-        data = list(models.DcInfo.objects.get(id=info_id).idcinfo_set.all().values_list('id', 'name'))
+        data = list(
+            models.DcInfo.objects.get(
+                id=info_id).idcinfo_set.all().values_list(
+                'id', 'name'))
         data.insert(0, ('', '机房'))
     elif name == 'cabinet':
-        data = list(models.IDCInfo.objects.get(id=info_id).cabinet_set.all().values_list('id', 'number'))
+        data = list(
+            models.IDCInfo.objects.get(
+                id=info_id).cabinet_set.all().values_list(
+                'id', 'number'))
         data.insert(0, ('', '机柜'))
     elif name == 'equipment':
-        data = list(models.Cabinet.objects.get(id=info_id).equipmen_set.all().values_list('id', 'manufacturers', 'model_num', 'serial_num'))
+        data = list(
+            models.Cabinet.objects.get(
+                id=info_id).equipmen_set.all().values_list(
+                'id',
+                'manufacturers',
+                'model_num',
+                'serial_num'))
         data.insert(0, ('', '厂商', '型号', 'SN'))
     elif name == 'dc':
         data = list(models.DcInfo.objects.all().values_list('id', 'name'))

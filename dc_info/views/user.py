@@ -10,7 +10,8 @@ def userprofile(request):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
     if request.method == 'GET':
-        return render(request, 'dc_info/userprofile.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj})
+        return render(request, 'dc_info/userprofile.html',
+                      {"dc_obj": dc_obj, 'customer_obj': customer_obj})
     elif request.method == 'POST':
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
@@ -20,4 +21,8 @@ def userprofile(request):
             user.save()
             return redirect(settings.LOGIN_URL)
         else:
-            return render(request, 'dc_info/userprofile.html', {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'erro': '两次输入密码不一致！'})
+            return render(request,
+                          'dc_info/userprofile.html',
+                          {"dc_obj": dc_obj,
+                           'customer_obj': customer_obj,
+                           'erro': '两次输入密码不一致！'})

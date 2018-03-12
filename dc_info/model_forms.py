@@ -1,6 +1,6 @@
 from dc_info import models
 from django import forms
-from django.forms import widgets as ws , fields
+from django.forms import widgets as ws, fields
 from django.forms.models import modelformset_factory
 
 
@@ -9,7 +9,10 @@ class EquipmentForms(forms.ModelForm):
         model = models.Equipmen
         fields = '__all__'
         widgets = {
-            'up_date': ws.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'up_date': ws.DateInput(
+                attrs={
+                    'type': 'date',
+                    'class': 'form-control'}),
         }
 
     def __init__(self, cabinet_choices=(), *args, **kwargs):
@@ -35,40 +38,57 @@ class IpAddressForms(forms.ModelForm):
 
 class PortInfoForms(forms.ModelForm):
     dcname = fields.CharField(
-        widget=ws.Select(attrs={'class': 'form-control', 'onchange': 'getDcChange($(this))'}),
+        widget=ws.Select(
+            attrs={
+                'class': 'form-control',
+                'onchange': 'getDcChange($(this))'}),
         label='数据中心',
-        required=False
-    )
+        required=False)
     idcname = fields.CharField(
-        widget=ws.Select(attrs={'class': 'form-control', 'onchange': 'getIdcChange($(this))'}),
+        widget=ws.Select(
+            attrs={
+                'class': 'form-control',
+                'onchange': 'getIdcChange($(this))'}),
         label='机房',
-        required=False
-    )
+        required=False)
     cabinet = fields.CharField(
-        widget=ws.Select(attrs={'class': 'form-control', 'onchange': 'getCabinetChange($(this))'}),
+        widget=ws.Select(
+            attrs={
+                'class': 'form-control',
+                'onchange': 'getCabinetChange($(this))'}),
         label='机柜',
-        required=False
-    )
+        required=False)
 
     class Meta:
         model = models.PortInfo
         fields = ['self_equipment_port', 'up_equipment', 'up_equipment_port']
         exclude = ['self_equipment']
         widgets = {
-            'self_equipment_port': ws.TextInput(attrs={'class': 'form-control'}),
-            'up_equipment': ws.Select(attrs={'class': 'form-control'}),
-            'up_equipment_port': ws.TextInput(attrs={'class': 'form-control'})
-        }
+            'self_equipment_port': ws.TextInput(
+                attrs={
+                    'class': 'form-control'}),
+            'up_equipment': ws.Select(
+                attrs={
+                    'class': 'form-control'}),
+            'up_equipment_port': ws.TextInput(
+                attrs={
+                    'class': 'form-control'})}
 
     def __init__(self, *args, **kwargs):
         super(PortInfoForms, self).__init__(*args, **kwargs)
-        dcname_choices = list(models.DcInfo.objects.all().values_list('id', 'name'))
+        dcname_choices = list(
+            models.DcInfo.objects.all().values_list(
+                'id', 'name'))
         dcname_choices.insert(0, ('', '数据中心'))
         self.fields['dcname'].widget.choices = dcname_choices
-        idcname_choices = list(models.IDCInfo.objects.all().values_list('id', 'name'))
+        idcname_choices = list(
+            models.IDCInfo.objects.all().values_list(
+                'id', 'name'))
         idcname_choices.insert(0, ('', '机房'))
         self.fields['idcname'].widget.choices = idcname_choices
-        cabinet_choices = list(models.Cabinet.objects.all().values_list('id', 'number'))
+        cabinet_choices = list(
+            models.Cabinet.objects.all().values_list(
+                'id', 'number'))
         cabinet_choices.insert(0, ('', '机柜'))
         self.fields['cabinet'].widget.choices = cabinet_choices
 
