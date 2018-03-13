@@ -4,7 +4,7 @@
 [![Django](https://img.shields.io/badge/django-1.11-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
 
 ## 简介
-使用Python写的IDC资产管理系统，让运维更简单！
+使用Python写的IDC资产管理系统，让运维更简单！by:小杰
 
 ## 启动
     pip3 install -r requirements.txt  
