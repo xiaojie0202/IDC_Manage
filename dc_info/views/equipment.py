@@ -35,8 +35,9 @@ def get_equipmen_info(request, dcname, idcname):
         equipmen_obj = models.Equipmen.objects.filter(
             cabinet__in=cabinet_queryset, **condition).order_by('cabinet')
     else:
+        search_equipment = search_cabinet.strip()
         equipmen_obj = models.Equipmen.objects.filter(cabinet__in=cabinet_queryset).order_by(
-            'cabinet').filter(Q(ipaddress__ipaddre=search_cabinet) | Q(serial_num__icontains=search_cabinet))
+            'cabinet').filter(Q(ipaddress__ipaddre=search_equipment) | Q(serial_num__icontains=search_equipment))
     if current_page == 'all':
         paginator = CustomPaginator(1, 11, equipmen_obj, equipmen_obj.count())
     else:
