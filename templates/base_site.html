@@ -92,4 +92,12 @@
     {% block motai %}
 
     {% endblock motai %}
+    <script>
+        $(function () {
+            $('input').addClass('form-control');
+            $('input[type=checkbox]').removeClass('form-control');
+            $('select').addClass('form-control');
+            $('textarea').addClass('form-control');
+        });
+    </script>
 {% endblock boby %}

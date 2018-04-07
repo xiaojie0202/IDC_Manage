@@ -18,9 +18,9 @@ class EquipmentForms(forms.ModelForm):
     def __init__(self, cabinet_choices=(), *args, **kwargs):
         super(EquipmentForms, self).__init__(*args, **kwargs)
         self.fields['cabinet'].widget.choices = cabinet_choices
-        for field_name in self.base_fields:
-            field = self.base_fields[field_name]
-            field.widget.attrs.update({'class': 'form-control'})
+        # for field_name in self.base_fields:
+        #     field = self.base_fields[field_name]
+        #     field.widget.attrs.update({'class': 'form-control'})
 
 
 class IpAddressForms(forms.ModelForm):
@@ -106,11 +106,11 @@ class InventoryForms(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(InventoryForms, self).__init__(*args, **kwargs)
-        for field_name in self.base_fields:
-            field = self.base_fields[field_name]
-            field.widget.attrs.update({'class': 'form-control'})
+        # for field_name in self.base_fields:
+        #     field = self.base_fields[field_name]
+        #     field.widget.attrs.update({'class': 'form-control'})
 
 
-class TestForm(forms.Form):
-    name = fields.CharField(max_length=12, required=True)
-    password = fields.CharField(max_length=12, required=True)
+# class TestForm(forms.Form):
+#     name = fields.CharField(max_length=12, required=True)
+#     password = fields.CharField(max_length=12, required=True)

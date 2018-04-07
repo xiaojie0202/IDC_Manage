@@ -60,7 +60,7 @@
                                 <label for="{{ field.auto_id }}"
                                        class="col-sm-2 control-label">{{ field.label }}</label>
                                 <div class="col-sm-9">
-                                    {{ field }} <span style="color: red">{{ field.errors }}</span>
+                                    {% hendel_date field.name field %}
                                 </div>
                             </div>
                         {% endfor %}

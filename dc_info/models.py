@@ -127,8 +127,7 @@ class Equipmen(models.Model):
     up_date = models.DateField(
         verbose_name='上架日期',
         blank=True,
-        null=True,
-        default=timezone.now)
+        null=True)
     customer = models.ForeignKey('Customer', verbose_name='所属客户')
     node = models.TextField(verbose_name='设备信息描述', blank=True, null=True)
 

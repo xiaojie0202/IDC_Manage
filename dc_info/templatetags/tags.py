@@ -42,6 +42,7 @@ def abnormal_condition(filter, type):
     return ele
 
 
+# 客户机柜日志页面拼接GET请求
 @register.simple_tag
 def customet_cabinet_log(filter, type):
     ele = ''
@@ -55,3 +56,15 @@ def customet_cabinet_log(filter, type):
         return ''
 
     return mark_safe(ele)
+
+
+# 编辑机柜解决显示机柜的问题
+@register.simple_tag
+def hendel_date(date, field):
+    if date == 'up_date':
+        da = str(field.value())
+        da.replace('-', '/')
+        field.initial = da
+        return field
+    else:
+        return field
