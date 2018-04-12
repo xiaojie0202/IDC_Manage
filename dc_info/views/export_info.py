@@ -8,7 +8,7 @@ from dc_info import models
 def export_info(request, dcname, idcname, flag):
     if request.method == 'GET':
         response = HttpResponse(content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment;filename="%s"' % flag
+        response['Content-Disposition'] = 'attachment;filename="%s.xls"' % flag
         if flag == 'cabinet':
             export_cabinet(dcname, idcname, response)
             return response
@@ -85,7 +85,7 @@ def export_equipment(dcname, idcname, response):
         sheet.write(num, 2, d.get('cabinet__number'))
         if d.get('equipment_type') == 1:
             sheet.write(num, 3, '服务器设备')
-        elif d.get('equipment_type') == 0:
+        elif d.get('equipment_type') == 2:
             sheet.write(num, 3, '网络设备')
         else:
             sheet.write(num, 3, None)
