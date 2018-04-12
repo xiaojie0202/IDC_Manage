@@ -197,7 +197,8 @@
                        href="{% url 'dcinfo:import_equipment' dcname idcname %}"><span
                             class="glyphicon glyphicon-share-alt"></span>导入设备
                     </a>
-                    <a type="button" class="btn btn-default navbar-btn"><span
+                    <a type="button" class="btn btn-default navbar-btn"
+                        href="{% url 'dcinfo:export_info' dcname idcname 'equipment' %}"><span
                             class="glyphicon glyphicon-share-alt"></span>导出设备
                     </a>
                 </div>
