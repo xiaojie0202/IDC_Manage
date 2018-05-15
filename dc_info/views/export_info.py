@@ -15,6 +15,9 @@ def export_info(request, dcname, idcname, flag):
         elif flag == 'equipment':
             export_equipment(dcname, idcname, response)
             return response
+        elif flag == 'inventory':
+            export_inventory(dcname, idcname, response)
+            return response
 
 
 # 生成机柜excel文件
@@ -96,5 +99,31 @@ def export_equipment(dcname, idcname, response):
         sheet.write(num, 8, d.get('place_u'))
         sheet.write(num, 9, d.get('customer__name'))
         sheet.write(num, 10, fmat_date(d.get('up_date')))
+        # sheet.write_merge(top_row, bottom_row, left_column, right_column, 'Long Cell')
         num = num + 1
+    workbook.save(response)
+
+
+# 生成库存excel文件筐
+def export_inventory(dcname, idcname, response):
+    idc = models.IDCInfo.objects.get(dc__name=dcname, name=idcname)
+    inventory_obj = idc.inventory_set.all()
+    workbook = xlwt.Workbook(encoding='utf-8')  # 创建工作簿
+    sheet = workbook.add_sheet("sheet1")  # 创建工作页
+    row0 = ['数据中心', '机房', '位置', '名称', '型号', '资产编号', '数量', '所属客户', '描述', '物流单号']
+    for i in enumerate(row0):
+        sheet.write(0, i[0], i[1])
+    num = 1
+    for inventory in inventory_obj:
+        sheet.write(num, 0, dcname)
+        sheet.write(num, 1, idcname)
+        sheet.write(num, 2, inventory.place)
+        sheet.write(num, 3, inventory.name)
+        sheet.write(num, 4, inventory.name_num)
+        sheet.write(num, 5, inventory.sn)
+        sheet.write(num, 6, inventory.count)
+        sheet.write(num, 7, inventory.customer.name)
+        sheet.write(num, 8, inventory.node)
+        sheet.write(num, 9, inventory.post_number)
+        num += 1
     workbook.save(response)

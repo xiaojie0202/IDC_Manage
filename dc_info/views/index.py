@@ -1,6 +1,8 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from dc_info import models
+from django.db.models import Q
+
 import json
 import datetime
 
@@ -8,6 +10,16 @@ import datetime
 # 首页
 @login_required
 def index(request):
+    if request.method == 'POST':
+        search_info = request.POST.get('search_info')
+        if search_info:
+            search_info = search_info.strip()
+            info = models.Equipmen.objects.filter(Q(serial_num__icontains=search_info) | Q(ipaddress__ipaddre=search_info)).first()
+            if info:
+                idc = info.cabinet.idc
+                dcname = idc.dc.name
+                serial_num = info.serial_num
+                return redirect('/equipmen/%s/%s/?search_cabinet=%s' % (dcname, idc.name, serial_num))
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
     dc_obj.idc_count = models.IDCInfo.objects.all().count()

@@ -65,7 +65,7 @@ urlpatterns = [
         view=customer.get_customer, name='get_customer'),  # 获取客户信息
     url(r'^ajax_cabinet_broken_line/$',
         index.ajax_cabinet_broken_line),  # 前端主页获取折线图数据
-    url(r'^export_info/(?P<dcname>.+)/(?P<idcname>.+)/export_(?P<flag>cabinet|equipment)/$', view=export_info.export_info, name='export_info'),
+    url(r'^export_info/(?P<dcname>.+)/(?P<idcname>.+)/export_(?P<flag>cabinet|equipment|inventory)/$', view=export_info.export_info, name='export_info'),
 
 
 
