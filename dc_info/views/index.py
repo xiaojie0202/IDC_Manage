@@ -14,7 +14,7 @@ def index(request):
         search_info = request.POST.get('search_info')
         if search_info:
             search_info = search_info.strip()
-            info = models.Equipmen.objects.filter(Q(serial_num__icontains=search_info) | Q(ipaddress__ipaddre=search_info)).first()
+            info = models.Equipmen.objects.filter(Q(serial_num__icontains=search_info) | Q(ipaddress__ipaddre=search_info) | Q(node__icontains=search_info)).first()
             if info:
                 idc = info.cabinet.idc
                 dcname = idc.dc.name
