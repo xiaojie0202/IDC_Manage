@@ -57,21 +57,17 @@
 
 {% block motai-body %}
     <form id="serpasswordforms" method="post">
-    {% csrf_token %}
-        <div class="form-group">
-            <label for="password1">请输入密码</label>
-            <input type="password" name="password1" class="form-control" id="password1" placeholder="password">
-        </div>
-        <div class="form-group">
-            <label for="password2">请再次输入密码</label>
-            <input type="password" name="password2" class="form-control" id="password2" placeholder="Password">
-        </div>
+        {% csrf_token %}
+        {% for form in forms %}
+            <div class="form-group">
+                {{ form.label_tag }}
+                {{ form }} <span style="color: red">{{ form.errors.0 }}</span>
+            </div>
+        {% endfor %}
     </form>
 {% endblock motai-body %}
 
 {% block motai-btn %}
-    <button type="submit" class="btn btn-default" form="serpasswordforms">保存</button>
-
-
+    <button type="submit" class="btn btn-primary" form="serpasswordforms">保存</button>
 {% endblock motai-btn %}
 

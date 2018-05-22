@@ -1,7 +1,9 @@
 from dc_info import models
 from django import forms
 from django.forms import widgets as ws, fields
+from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
+from django.contrib.auth import authenticate
 
 
 class EquipmentForms(forms.ModelForm):
@@ -106,11 +108,27 @@ class InventoryForms(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(InventoryForms, self).__init__(*args, **kwargs)
-        # for field_name in self.base_fields:
-        #     field = self.base_fields[field_name]
-        #     field.widget.attrs.update({'class': 'form-control'})
 
 
-# class TestForm(forms.Form):
-#     name = fields.CharField(max_length=12, required=True)
-#     password = fields.CharField(max_length=12, required=True)
+class ChangePasswordForm(forms.Form):
+    old_password = fields.CharField(required=True, widget=ws.PasswordInput, label='旧密码')
+    password1 = fields.CharField(max_length=64, min_length=8, required=True, widget=ws.PasswordInput, label='新密码')
+    password2 = fields.CharField(max_length=64, min_length=8, required=True, widget=ws.PasswordInput, label='请重新输入新密码')
+
+    def __init__(self, username, *args, **kwargs):
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+        self.username = username
+
+    def clean_old_password(self):
+        if not authenticate(username=self.username, password=self.cleaned_data.get('old_password')):
+            raise ValidationError('旧密码输入错误')
+        else:
+            return self.cleaned_data.get('old_password')
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password2 != password1:
+            raise ValidationError('两次输入密码不一样')
+        else:
+            return self.cleaned_data.get('password2')
