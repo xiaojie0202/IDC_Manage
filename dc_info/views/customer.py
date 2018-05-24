@@ -24,7 +24,7 @@ def get_customer(request, customet_name):
         dc_idc = customer.cabinet_set.values(
             'idc__dc__name', 'idc__name').distinct()
         
-         for i in dc_idc:
+        for i in dc_idc:
             dc = i.get('idc__dc__name')
             idc = i.get('idc__name')
             name = "%s-%s" % (dc, idc)
