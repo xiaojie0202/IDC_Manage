@@ -23,13 +23,14 @@ def get_customer(request, customet_name):
         data = {'name': [], 'value': []}
         dc_idc = customer.cabinet_set.values(
             'idc__dc__name', 'idc__name').distinct()
-        for i in dc_idc:
-            name = "%s-%s" % (i.get('idc__dc__name'), i.get('idc__name'))
-            data['name'].append(name)
-
-        for i in data['name']:
-            dc, idc = i.split('-')
+        
+         for i in dc_idc:
+            dc = i.get('idc__dc__name')
+            idc = i.get('idc__name')
+            name = "%s-%s" % (dc, idc)
             cabinet_count = customer.cabinet_set.filter(
                 idc__dc__name=dc, idc__name=idc).count()
-            data['value'].append({'value': cabinet_count, 'name': i})
+            data['name'].append(name)
+            data['value'].append({'value': cabinet_count, 'name': name})
+            
         return HttpResponse(json.dumps(data))
