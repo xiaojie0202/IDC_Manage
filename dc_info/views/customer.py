@@ -32,5 +32,6 @@ def get_customer(request, customet_name):
                 idc__dc__name=dc, idc__name=idc).count()
             data['name'].append(name)
             data['value'].append({'value': cabinet_count, 'name': name})
+            #
             
         return HttpResponse(json.dumps(data))
