@@ -7,13 +7,13 @@
 使用Python写的IDC资产管理系统，让运维更简单！by:小杰
 
 ## 启动
-    pip3 install -r requirements.txt  
-    
+    pip3 install -r requirements.txt  # xadmin可能会安装失败 
+        
     python3 manage.py makemigrations
 
-     python3 manage.py migrate
+      python3 manage.py migrate
   
-   python3 manage.py runserver 0.0.0.0:9000
+     python3 manage.py runserver 0.0.0.0:9000
 ## 使用说明
   .........................
   
