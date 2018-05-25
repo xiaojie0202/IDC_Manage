@@ -28,7 +28,9 @@
                         <div class="profile-info">
                             <h4 class="heading">基本信息</h4>
                             <ul class="list-unstyled list-justify">
-                                <li>用户名 <span>{{ request.user }}</span></li>
+                                <li>姓名 <span>{{ request.user.name }}</span></li>
+                                <li>生日 <span>{{ request.user.birthday }}</span></li>
+                                <li>创建日期 <span>{{ request.user.create_date }}</span></li>
                                 <li>Email <span>{{ request.user.email }}</span></li>
                             </ul>
                         </div>
