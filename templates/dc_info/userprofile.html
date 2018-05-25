@@ -17,8 +17,8 @@
                     <div class="profile-header">
                         <div class="overlay"></div>
                         <div class="profile-main">
-                            <img src="{% static 'assets/img/user-medium.png' %}" class="img-circle" alt="Avatar">
-                            <h3 class="name">{{ request.user.last_name }}{{ request.user.first_name }}</h3>
+                            <img src="{{ request.user.head_img.url }}" class="img-circle" alt="Avatar", style="width: 90px; height: 90px">
+                            <h3 class="name">{{ request.user.name }}</h3>
                             <span class="online-status status-available">在线</span>
                         </div>
                     </div>

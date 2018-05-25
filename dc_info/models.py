@@ -1,8 +1,7 @@
 from django.utils.html import format_html
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils import timezone
-
+from django.conf import settings
 
 class DcInfo(models.Model):
     '''数据中心信息'''
@@ -267,7 +266,7 @@ class Inventory(models.Model):
 
 class CabinetLog(models.Model):
     '机柜操作日志'
-    handle_user = models.ForeignKey(User, verbose_name='操作用户')
+    handle_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作用户')
     handle_type_choices = ((0, '关闭'), (1, '开通'),)
     handle_type = models.PositiveSmallIntegerField(
         choices=handle_type_choices, verbose_name='操作类型')
@@ -308,7 +307,7 @@ class CabinetLog(models.Model):
 
 class EquipmenLog(models.Model):
     '''设备操作日志'''
-    handle_user = models.ForeignKey(User, verbose_name='操作用户')
+    handle_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作用户')
     handle_type_choices = ((0, '下架'), (1, '上架'),)
     handle_type = models.PositiveSmallIntegerField(
         choices=handle_type_choices, verbose_name='操作类型')
