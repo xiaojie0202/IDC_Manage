@@ -12,7 +12,6 @@ import os
 
 
 # 前端获取库存信息
-@login_required
 def get_inventory(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -58,7 +57,6 @@ def get_inventory(request, dcname, idcname):
 
 
 # 删除库存信息
-@login_required
 def delete_inventory(request):
     if request.method == 'POST':
         idlist = []
@@ -84,7 +82,6 @@ def update_inventory_count(request, operation):
 
 
 # 增加库存信息
-@login_required
 def add_inventory(request, dcname, idcname):
     context = {}
     dc_obj = models.DcInfo.objects.all()
@@ -114,7 +111,6 @@ def add_inventory(request, dcname, idcname):
 
 
 # 编辑库存信息
-@login_required
 def edit_inventory(request, dcname, idcname, inventory_id):
     context = {}
     dc_obj = models.DcInfo.objects.all()
@@ -144,7 +140,6 @@ def edit_inventory(request, dcname, idcname, inventory_id):
 
 
 # 批量导入库存信息
-@login_required
 def bulk_import_inventory(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()

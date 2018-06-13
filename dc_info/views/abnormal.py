@@ -7,7 +7,6 @@ from dc_info import models
 
 
 # 前端获取异常信息数据统计页面
-@login_required
 def get_abnormal(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()

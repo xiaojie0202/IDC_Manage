@@ -4,7 +4,6 @@ import xlwt
 from dc_info import models
 
 
-@login_required
 def export_info(request, dcname, idcname, flag):
     if request.method == 'GET':
         response = HttpResponse(content_type='application/vnd.ms-excel')

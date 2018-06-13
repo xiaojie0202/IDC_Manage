@@ -9,7 +9,6 @@ import os
 
 
 # 前端获取机柜信息页面
-@login_required
 def get_cabinet_info(request, dcname, idcname, *args, **kwargs):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -55,7 +54,6 @@ def get_cabinet_info(request, dcname, idcname, *args, **kwargs):
 
 
 # 添加机柜
-@login_required
 def create_cabinet(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -99,7 +97,6 @@ def create_cabinet(request, dcname, idcname):
 
 
 # 删除机柜
-@login_required
 def delete_cabinet(request):
 
     if request.method == 'POST':
@@ -118,7 +115,6 @@ def delete_cabinet(request):
 
 
 # 批量导入机柜
-@login_required
 def import_cabinet(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -159,7 +155,6 @@ def import_cabinet(request, dcname, idcname):
 
 
 # 主页获取机柜操作日志
-@login_required
 def customet_cabinet_log(request):
     current_page = request.GET.get('page', 1)
     cabinet_number = request.GET.get('cabinet_number')

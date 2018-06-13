@@ -5,7 +5,6 @@ import json
 import datetime
 
 
-@login_required
 def get_customer(request, customet_name):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()

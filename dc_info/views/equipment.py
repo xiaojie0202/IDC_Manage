@@ -14,7 +14,6 @@ import os
 
 
 # 前端获取设备信息页面
-@login_required
 def get_equipmen_info(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -66,7 +65,6 @@ def get_equipmen_info(request, dcname, idcname):
 
 
 # 删除设备
-@login_required
 def delete_equipment(request):
     if request.method == 'POST':
         idlist = []
@@ -84,7 +82,6 @@ def delete_equipment(request):
 
 
 # 增加设备信息
-@login_required
 def create_equipment(request, dcname, idcname):
     context = {}
     dc_obj = models.DcInfo.objects.all()
@@ -141,7 +138,6 @@ def create_equipment(request, dcname, idcname):
 
 
 # 前端批量导入设备信息
-@login_required
 def import_equipment(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -224,7 +220,6 @@ def import_equipment(request, dcname, idcname):
 
 
 # 编辑设备信息
-@login_required
 def edit_equipment(request, dcname, idcname, equipment_id):
     context = {}
     dc_obj = models.DcInfo.objects.all()
@@ -300,7 +295,6 @@ def edit_equipment(request, dcname, idcname, equipment_id):
 
 
 # 前端获取数据中心数据统计页面
-@login_required
 def date_stat(request, dcname, idcname):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
@@ -313,7 +307,6 @@ def date_stat(request, dcname, idcname):
 
 
 # 访问客户设备操作日志
-@login_required
 def customer_equipmen_log(request):
     current_page = request.GET.get('page', 1)
     if request.method == 'POST':
@@ -372,7 +365,7 @@ def show_network_port(request):
 
 
 # 编辑设备页面Select框获取数据
-@login_required
+# @login_required
 def equipment_getinfo(request, name):
     info_id = request.POST['id']
     data = None

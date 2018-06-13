@@ -6,7 +6,6 @@ from dc_info.model_forms import ChangePasswordForm
 
 
 # 个人信息页面
-@login_required
 def userprofile(request):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()

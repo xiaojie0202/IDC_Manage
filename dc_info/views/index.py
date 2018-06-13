@@ -8,7 +8,6 @@ import datetime
 
 
 # 首页
-@login_required
 def index(request):
     if request.method == 'POST':
         search_info = request.POST.get('search_info')
@@ -30,7 +29,6 @@ def index(request):
 
 
 # 机柜增减折线图需要的数据
-@login_required
 def ajax_cabinet_broken_line(request):
     if request.method == 'POST':
         data = {
