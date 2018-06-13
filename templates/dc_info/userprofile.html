@@ -17,8 +17,8 @@
                     <div class="profile-header">
                         <div class="overlay"></div>
                         <div class="profile-main">
-                            <img src="{% static 'assets/img/user-medium.png' %}" class="img-circle" alt="Avatar">
-                            <h3 class="name">{{ request.user.last_name }}{{ request.user.first_name }}</h3>
+                            <img src="{{ request.user.head_img.url }}" class="img-circle" alt="Avatar", style="width: 90px; height: 90px">
+                            <h3 class="name">{{ request.user.name }}</h3>
                             <span class="online-status status-available">在线</span>
                         </div>
                     </div>
@@ -28,7 +28,9 @@
                         <div class="profile-info">
                             <h4 class="heading">基本信息</h4>
                             <ul class="list-unstyled list-justify">
-                                <li>用户名 <span>{{ request.user }}</span></li>
+                                <li>姓名 <span>{{ request.user.name }}</span></li>
+                                <li>生日 <span>{{ request.user.birthday }}</span></li>
+                                <li>创建日期 <span>{{ request.user.create_date }}</span></li>
                                 <li>Email <span>{{ request.user.email }}</span></li>
                             </ul>
                         </div>

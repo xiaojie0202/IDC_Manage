@@ -11,14 +11,14 @@ def userprofile(request):
     dc_obj = models.DcInfo.objects.all()
     customer_obj = models.Customer.objects.all()
     if request.method == 'GET':
-        password_form = ChangePasswordForm(request.user.username)
+        password_form = ChangePasswordForm(request.user.get_username())
         return render(request, 'dc_info/userprofile.html',
                       {"dc_obj": dc_obj, 'customer_obj': customer_obj, 'forms': password_form})
     elif request.method == 'POST':
-        password_form = ChangePasswordForm(request.user.username, request.POST)
+        password_form = ChangePasswordForm(request.user.get_username(), request.POST)
         if password_form.is_valid():
             password = password_form.cleaned_data.get('password2')
-            user = models.User.objects.get(id=request.user.id)
+            user = request.user
             user.set_password(password)
             user.save()
             return redirect(settings.LOGIN_URL)

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dc_info.apps.DcInfoConfig',
+    'dc_user.apps.DcUserConfig',
     'xadmin',
     'crispy_forms',
     'reversion'
@@ -147,3 +148,6 @@ LOGIN_URL = '/login/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+
+AUTH_USER_MODEL = 'dc_user.UserProfile'

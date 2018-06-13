@@ -24,7 +24,7 @@
                 <td>{{ logobj.model_num }}</td>
                 <td>{{ logobj.serial_num }}</td>
                 <td>{{ logobj.ipaddre }}</td>
-                <td>{{ logobj.handle_user.last_name }}{{ logobj.handle_user.first_name }}</td>
+                <td>{{ logobj.handle_user.name }}</td>
                 {% if logobj.handle_type == 0 %}
                     <td><span class="label label-danger">下架</span></td>
                 {% else %}

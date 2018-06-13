@@ -17,6 +17,8 @@ from django.conf.urls import url, include
 from xadmin.plugins import xversion
 from django.views.generic.base import RedirectView
 from IDC_Manage import views
+from django.conf.urls.static import static
+from django.conf import settings
 import xadmin
 import dc_info.urls
 
@@ -31,7 +33,7 @@ urlpatterns = [
     url(r'^logout', views.acc_logout, name='logout'),
     url(r'^favicon.ico$', RedirectView.as_view(url='/static/favicon.ico')),
     url(r'^', include(dc_info.urls, namespace='dcinfo'))
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler403 = views.permission_denied
 handler404 = views.page_no_found
